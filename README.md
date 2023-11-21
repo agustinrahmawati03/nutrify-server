@@ -74,20 +74,19 @@ BASE URL :
 
 ```json
 {
-    "message": "login success, welcome!",
-    "token": "string",
-    "username": "string",
-    "email": "string",
-    "gender": "string",
-    "status": "string",
-    "password": "string encrypt",
-    "tinggi": "number",
-    "berat": "number",
-    "umur": "number",
-    "caloriNeeded": "number",
-    "carboNeeded": "number",
-    "proteinNeeded": "number",
-    "fatNeeded": "number"
+  "message": "login success, welcome!",
+  "token": "string",
+  "username": "string",
+  "email": "string",
+  "gender": "string",
+  "status": "string",
+  "password": "string encrypt",
+  "tinggi": "number",
+  "berat": "number",
+  "umur": "number",
+  "caloriNeeded": "number",
+  "carboNeeded": "number",
+  "proteinNeeded": "number",
+  "fatNeeded": "number"
 }
-``
 ```
