@@ -1,3 +1,4 @@
+const userModel = require('../models/user');
 const { getLevelActivity, hitungBMI } = require('../service');
 
 const signup = (req, res) => {
@@ -62,15 +63,16 @@ const signup = (req, res) => {
   } catch (error) {}
 };
 
-const signin = (req, res) => {
+const signin = async (req, res) => {
   try {
     // get data from user
     let { email, password } = req.body;
 
     // check is user exist
+    const user = await userModel.findOne({ email: 'tes@gmail.com' });
 
     // make a response
-    res.status(200).json({ message: 'user login' });
+    res.status(200).json({ message: 'user login', body: user });
   } catch (error) {}
 };
 
