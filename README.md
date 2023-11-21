@@ -29,7 +29,8 @@ BASE URL :
     "tinggi": "number",
     "berat": "number",
     "umur": "number",
-    "password": "string"
+    "password": "string",
+    "levAktivitas": "number"
   }
   ```
 - Authentication - Bearer Token : `<token key>`
@@ -42,6 +43,7 @@ BASE URL :
   "username": "string",
   "email": "string",
   "gender": "string",
+  "status": "string",
   "password": "string encrypt",
   "tinggi": "number",
   "berat": "number",
@@ -49,7 +51,8 @@ BASE URL :
   "caloriNeeded": "number",
   "carboNeeded": "number",
   "proteinNeeded": "number",
-  "fatNeeded": "number"
+  "fatNeeded": "number",
+  "levAktivitas": "number"
 }
 ```
 
@@ -74,20 +77,19 @@ BASE URL :
 
 ```json
 {
-    "message": "login success, welcome!",
-    "token": "string",
-    "username": "string",
-    "email": "string",
-    "gender": "string",
-    "status": "string",
-    "password": "string encrypt",
-    "tinggi": "number",
-    "berat": "number",
-    "umur": "number",
-    "caloriNeeded": "number",
-    "carboNeeded": "number",
-    "proteinNeeded": "number",
-    "fatNeeded": "number"
+  "message": "login success, welcome!",
+  "token": "string",
+  "username": "string",
+  "email": "string",
+  "gender": "string",
+  "status": "string",
+  "password": "string encrypt",
+  "tinggi": "number",
+  "berat": "number",
+  "umur": "number",
+  "caloriNeeded": "number",
+  "carboNeeded": "number",
+  "proteinNeeded": "number",
+  "fatNeeded": "number"
 }
-``
 ```
