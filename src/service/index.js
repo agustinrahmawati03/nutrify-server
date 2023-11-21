@@ -18,4 +18,25 @@ const getLevelActivity = (levActivicty) => {
   return 1.2;
 };
 
-module.exports = { getLevelActivity };
+function hitungBMI(berat, tinggi) {
+  // Konversi tinggi ke dalam meter
+  let tinggiMeter = tinggi / 100; // Tinggi dalam cm, dikonversi ke meter
+
+  // Hitung BMI
+  let bmi = berat / (tinggiMeter * tinggiMeter);
+
+  if (bmi < 18.5) {
+    return 'Kurang';
+  }
+  if (bmi >= 18.5 && bmi <= 24.9) {
+    return 'Normal';
+  }
+  if (bmi >= 25.0 && bmi <= 29.9) {
+    return 'kelebihan berat badan';
+  }
+  if (bmi > 30) {
+    return 'Obesitas';
+  }
+}
+
+module.exports = { getLevelActivity, hitungBMI };

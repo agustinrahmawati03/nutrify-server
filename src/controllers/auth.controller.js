@@ -1,4 +1,4 @@
-const { getLevelActivity } = require('../service');
+const { getLevelActivity, hitungBMI } = require('../service');
 
 const signup = (req, res) => {
   try {
@@ -22,11 +22,43 @@ const signup = (req, res) => {
 
     // count nutrition needed
 
+    let bmr = 0;
+    let statusBMI = hitungBMI(berat, tinggi);
+    if (gender === 'laki-laki') {
+      bmr = 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur;
+    }
+    if (gender === 'perempuan') {
+      bmr = 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur;
+    }
+    const caloriNeeded = bmr * levelAktivitas;
+    let carboNeeded = (caloriNeeded * 0.65) / 4;
+    let proteinNeeded = (caloriNeeded * 0.15) / 4;
+    let fatNeeded = (caloriNeeded * 0.2) / 4;
+
     // encrypt the password and generate token
 
     // save to database
 
-    res.status(200).json({ message: levActivicty });
+    // make a response
+    const userData = {
+      username: username,
+      email: email,
+      gender: gender,
+      password: password,
+      tinggi: tinggi,
+      berat: berat,
+      umur: umur,
+      levelAktivitas: levelAktivitas,
+      caloriNeeded: caloriNeeded,
+      carboNeeded: carboNeeded,
+      proteinNeeded: proteinNeeded,
+      fatNeeded: fatNeeded,
+      statusBMI,
+    };
+
+    res
+      .status(200)
+      .json({ message: 'signup success', body: userData });
   } catch (error) {}
 };
 
