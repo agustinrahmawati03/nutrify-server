@@ -1,12 +1,12 @@
 const express = require('express');
-const router = require('./routes');
+const allrouter = require('./routes');
 
 const app = express();
 
 const port = process.env.PORT || 9000;
 
 app.use(express.json());
-app.use(router);
+app.use(allrouter);
 
 app.listen(port, () => {
   console.log('server running at http://localhost:' + port);

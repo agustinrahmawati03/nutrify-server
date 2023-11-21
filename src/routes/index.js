@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express();
 
-router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Hello World' });
-});
+const authRoute = require('./auth.router');
+
+router.use('/', authRoute);
 
 module.exports = router;
