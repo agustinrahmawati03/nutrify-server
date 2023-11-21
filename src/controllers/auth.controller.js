@@ -63,7 +63,15 @@ const signup = (req, res) => {
 };
 
 const signin = (req, res) => {
-  res.status(200).json({ message: 'user login' });
+  try {
+    // get data from user
+    let { email, password } = req.body;
+
+    // check is user exist
+
+    // make a response
+    res.status(200).json({ message: 'user login' });
+  } catch (error) {}
 };
 
 module.exports = { signup, signin };
