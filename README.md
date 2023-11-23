@@ -106,6 +106,112 @@ BASE URL :
 
 **Food**
 
+## **Add Many Foods (ADMIN)**
+
+**Request** :
+
+- Method : POST
+- Endpoint : `(base-url)/foods`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body :
+
+  ````json
+
+      [
+          {
+              "name":"string ",
+              "image": "string",
+              "category":"string unique",
+              "cal": "number",
+              "protein": "number",
+              "carb": "number",
+              "fat": "number",
+              "carbon": "number",
+              "desc": "string",
+          },
+          {
+              "name":"string",
+              "image": "string",
+              "category":"string unique",
+              "cal": "number",
+              "protein": "number",
+              "carb": "number",
+              "fat": "number",
+              "carbon": "number",
+              "desc": "string",
+          }
+      ]
+      ```
+
+  **Response** :
+  ````
+
+```json
+{
+  "message": "food added successfully",
+  "data": [
+    {
+      "name": "string ",
+      "image": "string",
+      "category": "string unique",
+      "cal": "number",
+      "protein": "number",
+      "carb": "number",
+      "fat": "number",
+      "carbon": "number",
+      "desc": "string"
+    },
+    {
+      "name": "string",
+      "image": "string",
+      "category": "string unique",
+      "cal": "number",
+      "protein": "number",
+      "carb": "number",
+      "fat": "number",
+      "carbon": "number",
+      "desc": "string"
+    }
+  ]
+}
+```
+
+## **Update Food Data (ADMIN)**
+
+**Request** :
+
+- Method : PATCH
+- Endpoint : `(base-url)/foods/{:food_id}`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body : (example)
+  `json
+  {
+      "cal": "number",
+      "protein": "number",
+      "carb": "number",
+      "fat": "number",
+      "carbon": "number",
+  }
+  `
+  **Response** :
+
+```json
+{
+  "message": "update success",
+  "foodUpdated": {
+    "acknowledged": true,
+    "modifiedCount": 1,
+    "upsertedId": null,
+    "upsertedCount": 0,
+    "matchedCount": 1
+  }
+}
+```
+
 ## **Get All Food Data**
 
 **Request**

@@ -17,6 +17,11 @@ const userSchema = new Schema(
       type: String,
       enum: ['pria', 'perempuan'],
     },
+    status: {
+      type: String,
+      maxlength: 150,
+      required: true,
+    },
     password: {
       type: String,
       maxlength: 255,
