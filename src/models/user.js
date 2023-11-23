@@ -15,7 +15,7 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ['laki-laki', 'perempuan'],
+      enum: ['pria', 'perempuan'],
     },
     password: {
       type: String,
