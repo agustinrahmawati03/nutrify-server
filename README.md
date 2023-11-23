@@ -118,8 +118,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number",
-    "carbon": "number",
+    "fat": "number"
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
@@ -149,8 +148,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number",
-    "carbon": "number",
+    "fat": "number"
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
@@ -181,8 +179,7 @@ BASE URL :
     "protein": "number",
     "carb": "number",
     "fat": "number",
-    "desc": "string",
-    "carbon": "number",
+    "desc": "string"
     "createdAt": "date",
     "updatedAt": "date"
   }
@@ -211,8 +208,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number",
-    "carbon": "number",
+    "fat": "number"
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
@@ -322,7 +318,6 @@ BASE URL :
       "protein": "number",
       "carb": "number",
       "fat": "number",
-      "carbon": "number",
       "desc": "string",
       "createdAt": "date",
       "updatedAt": "date"
@@ -397,8 +392,7 @@ BASE URL :
   "totCarb": "number",
   "totProtein": "number",
   "totFat": "number",
-  "totCal": "number",
-  "totCarbon": "number"
+  "totCal": "number"
 }
 ```
 
@@ -508,8 +502,7 @@ BASE URL :
   "totCarb": "number",
   "totProtein": "number",
   "totFat": "number",
-  "totCal": "number",
-  "totCarbon": "number"
+  "totCal": "number"
 }
 ```
 
