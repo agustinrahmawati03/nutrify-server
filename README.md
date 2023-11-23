@@ -16,27 +16,32 @@ BASE URL :
 **Request** :
 
 - Method : POST
-- Endpoint : `(base-url)/auth/signup`
-- Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body :
-  ```json
-  {
-    "email": "string",
-    "username": "string",
-    "gender": "string, enum('perempuan','laki-laki')",
-    "tinggi": "number",
-    "berat": "number",
-    "umur": "number",
-    "password": "string",
-    "levAktivitas": "number"
-  }
-  ```
-- Authentication - Bearer Token : `<token key>`
-  **Response** :
 
-```json
+- Endpoint : `(base-url)/auth/signup`
+
+- Header :
+   - Content-Type : application/json
+   - Accept : application/json
+
+- Body :
+
+```json {"id":"01HFX9CE9KMCTPDQ4GYEQS0RDM"}
+{
+  "email": "string",
+  "username": "string",
+  "gender": "string, enum('perempuan','pria')",
+  "tinggi": "number",
+  "berat": "number",
+  "umur": "number",
+  "password": "string",
+  "levAktivitas": "number"
+}
+```
+
+- Authentication - Bearer Token : `<token key>`
+   **Response** :
+
+```json {"id":"01HFX9CE9MZA4AC1N049S80ST9"}
 {
   "message": "success",
   "token": "string",
@@ -61,21 +66,26 @@ BASE URL :
 **Request** :
 
 - Method : POST
-- Endpoint : `(base-url)/auth/signin`
-- Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body :
-  ```json
-  {
-    "email": "string",
-    "password": "string"
-  }
-  ```
-- Authentication - Bearer Token : `<token key>`
-  **Response** :
 
-```json
+- Endpoint : `(base-url)/auth/signin`
+
+- Header :
+   - Content-Type : application/json
+   - Accept : application/json
+
+- Body :
+
+```json {"id":"01HFX9CE9NWYYQ3C43PWFXGS2Q"}
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+- Authentication - Bearer Token : `<token key>`
+   **Response** :
+
+```json {"id":"01HFX9CE9NWYYQ3C43PYCDNEZ8"}
 {
   "message": "login success, welcome!",
   "token": "string",
@@ -103,9 +113,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/foods`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CE9PT8RSYWQEFXFB0TRP"}
 [
   {
     "_id": "string unique",
@@ -118,7 +128,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number"
+    "fat": "number",
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
@@ -133,9 +143,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/foods/{:food_id}`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEBTD59T5MQ1G10YM3MT"}
 [
   {
     "_id": "string unique",
@@ -148,7 +158,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number"
+    "fat": "number",
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
@@ -163,9 +173,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/foods/category/{:category_id}`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEBVVCCF1GAN74XSVA6Y"}
 [
   {
     "_id": "string unique",
@@ -179,7 +189,7 @@ BASE URL :
     "protein": "number",
     "carb": "number",
     "fat": "number",
-    "desc": "string"
+    "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
   }
@@ -193,9 +203,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/foods/search?name={:query}`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEBVVCCF1GAN77KW9SSS"}
 [
   {
     "_id": "string unique",
@@ -208,7 +218,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number"
+    "fat": "number",
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"
@@ -225,9 +235,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/categories`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEBVVCCF1GAN7AXDHN99"}
 [
   {
     "_id": "string unique",
@@ -243,18 +253,19 @@ BASE URL :
 - Method : POST
 - Endpoint : `(base-url)/categories`
 - Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body :
-  `json
-{
-    "_id": "string",
-    "name":"string"
-}
-`
-  **Response** :
+   - Content-Type : application/json
+   - Accept : application/json
 
-```json
+- Body :
+   `json
+   {
+   "_id": "string",
+   "name":"string"
+   }
+   `
+   __Response__ :
+
+```json {"id":"01HFX9CEBVVCCF1GAN7D3JAY2J"}
 {
   "message": "category added successfully",
   "data": {
@@ -273,18 +284,19 @@ BASE URL :
 - Method : POST
 - Endpoint : `(base-url)/favorites`
 - Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body :
-  `json
-{
-    "user":"string unique",
-    "food":"string unique"
-}
-`
-  **Response** :
+   - Content-Type : application/json
+   - Accept : application/json
 
-```json
+- Body :
+   `json
+   {
+   "user":"string unique",
+   "food":"string unique"
+   }
+   `
+   **Response** :
+
+```json {"id":"01HFX9CEBZW5KAS0YKMFX2F5E2"}
 {
   "message": "favorite food data added successfully",
   "favorite": "string unique",
@@ -302,9 +314,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/favorites`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEC08V2WBKNDSS05J6J2"}
 [
   {
     "_id": "string unique",
@@ -333,9 +345,9 @@ BASE URL :
 - Method : DELETE
 - Endpoint : `(base-url)/favorites/{:favorite_id}`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEC08V2WBKNDSVRBKE07"}
 {
   "message": "favorite food data deleted successfully"
 }
@@ -348,11 +360,12 @@ BASE URL :
 - Method : POST
 - Endpoint : `(base-url)/tracking`
 - Header :
-  - Content-Type : application/json
-  - Accept : application/json
+   - Content-Type : application/json
+   - Accept : application/json
+
 - Body :
 
-```json
+```json {"id":"01HFX9CEC1FQN8KE7S2X0QVKDE"}
 {
   "food": [
     {
@@ -365,7 +378,7 @@ BASE URL :
 
 **Response** :
 
-```json
+```json {"id":"01HFX9CEC1FQN8KE7S2ZSD7ZX2"}
 {
   "_id": "string unique",
   "user": "string unique",
@@ -403,9 +416,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/tracking`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEC1FQN8KE7S320FWET1"}
 {
   "_id": "string unique",
   "user": "string unique",
@@ -458,9 +471,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/tracking/today`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEC1FQN8KE7S33GMNZXY"}
 {
   "_id": "string unique",
   "user": "string unique",
@@ -513,9 +526,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/tracking/{:date}`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEC1FQN8KE7S36KBTKSB"}
 {
   "_id": "string unique",
   "user": "string unique",
@@ -570,9 +583,9 @@ BASE URL :
 - Method : GET
 - Endpoint : `(base-url)/profile`
 - Header : - Accept : application/json
-  **Response** :
+   **Response** :
 
-```json
+```json {"id":"01HFX9CEC2K68587F4B0B7Q6D2"}
 {
   "_id": "string",
   "username": "string",
@@ -603,22 +616,23 @@ BASE URL :
 - Method : PUT
 - Endpoint : `(base-url)/profile`
 - Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body : (example)
-  `json
-{
-    "username": "string",
-    "gender": "string",
-    "tinggi": "number",
-    "berat": "number",
-    "levelAktivitas": "number",
-    "umur": "number"
-}
-`
-  **Response** :
+   - Content-Type : application/json
+   - Accept : application/json
 
-```json
+- Body : (example)
+   `json
+   {
+   "username": "string",
+   "gender": "string",
+   "tinggi": "number",
+   "berat": "number",
+   "levelAktivitas": "number",
+   "umur": "number"
+   }
+   `
+   **Response** :
+
+```json {"id":"01HFX9CEC2K68587F4B48VZKX4"}
 {
   "message": "profile has been changed successfully",
   "changeSuccess": {
@@ -643,20 +657,21 @@ BASE URL :
 - Method : PUT
 - Endpoint : `(base-url)/profile/account`
 - Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body :
-  `json
-{
-    "email": "string",
-    "currentPassword": "string",
-    "newPassword": "string",
-    "confirmPassword": "string"
-}
-`
-  **Response** :
+   - Content-Type : application/json
+   - Accept : application/json
 
-```json
+- Body :
+   `json
+   {
+   "email": "string",
+   "currentPassword": "string",
+   "newPassword": "string",
+   "confirmPassword": "string"
+   }
+   `
+   **Response** :
+
+```json {"id":"01HFX9CEC3KZKATZGP0DS6Q2XP"}
 {
   "message": "string",
   "changed": {
@@ -673,19 +688,20 @@ BASE URL :
 - Method : PUT
 - Endpoint : `(base-url)/profile/change-password`
 - Header :
-  - Content-Type : application/json
-  - Accept : application/json
-- Body : (example)
-  `json
-{
-    "currentPassword":"string",
-    "newPassword":"string",
-    "confirmPassword":"string"
-}
-`
-  **Response** :
+   - Content-Type : application/json
+   - Accept : application/json
 
-```json
+- Body : (example)
+   `json
+   {
+   "currentPassword":"string",
+   "newPassword":"string",
+   "confirmPassword":"string"
+   }
+   `
+   **Response** :
+
+```json {"id":"01HFX9CEC3KZKATZGP0ESDHNPH"}
 {
   "message": "Password have been Changed successfully",
   "success": {
