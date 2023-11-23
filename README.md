@@ -93,3 +93,625 @@ BASE URL :
   "fatNeeded": "number"
 }
 ```
+
+**Food**
+
+## **Get All Food Data**
+
+**Request**
+
+- Method : GET
+- Endpoint : `(base-url)/foods`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+[
+  {
+    "_id": "string unique",
+    "name": "string",
+    "image": "string",
+    "category": {
+      "_id": "string unique",
+      "name": "string"
+    },
+    "cal": "number",
+    "protein": "number",
+    "carb": "number",
+    "fat": "number",
+    "carbon": "number",
+    "desc": "string",
+    "createdAt": "date",
+    "updatedAt": "date"
+  }
+]
+```
+
+## **Get Food Data by Food Id**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/foods/{:food_id}`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+[
+  {
+    "_id": "string unique",
+    "name": "string",
+    "image": "string",
+    "category": {
+      "_id": "string unique",
+      "name": "string"
+    },
+    "cal": "number",
+    "protein": "number",
+    "carb": "number",
+    "fat": "number",
+    "carbon": "number",
+    "desc": "string",
+    "createdAt": "date",
+    "updatedAt": "date"
+  }
+]
+```
+
+## **Get Food By Category**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/foods/category/{:category_id}`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+[
+  {
+    "_id": "string unique",
+    "name": "string",
+    "image": "string",
+    "category": {
+      "_id": "string unique",
+      "name": "string"
+    },
+    "cal": "number",
+    "protein": "number",
+    "carb": "number",
+    "fat": "number",
+    "desc": "string",
+    "carbon": "number",
+    "createdAt": "date",
+    "updatedAt": "date"
+  }
+]
+```
+
+## **Search Food Data**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/foods/search?name={:query}`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+[
+  {
+    "_id": "string unique",
+    "name": "string",
+    "image": "string",
+    "category": {
+      "_id": "string unique",
+      "name": "string"
+    },
+    "cal": "number",
+    "protein": "number",
+    "carb": "number",
+    "fat": "number",
+    "carbon": "number",
+    "desc": "string",
+    "createdAt": "date",
+    "updatedAt": "date"
+  }
+]
+```
+
+# **Category**
+
+## **Get All Categories**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/categories`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+[
+  {
+    "_id": "string unique",
+    "name": "string"
+  }
+]
+```
+
+## **Add Category (ADMIN)**
+
+**Request** :
+
+- Method : POST
+- Endpoint : `(base-url)/categories`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body :
+  `json
+{
+    "_id": "string",
+    "name":"string"
+}
+`
+  **Response** :
+
+```json
+{
+  "message": "category added successfully",
+  "data": {
+    "_id": "string",
+    "name": "string"
+  }
+}
+```
+
+# **Favorite**
+
+## **Add Favorite Food**
+
+**Request** :
+
+- Method : POST
+- Endpoint : `(base-url)/favorites`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body :
+  `json
+{
+    "user":"string unique",
+    "food":"string unique"
+}
+`
+  **Response** :
+
+```json
+{
+  "message": "favorite food data added successfully",
+  "favorite": "string unique",
+  "newFav": {
+    "user_id": "string unique",
+    "food_id": "string unique"
+  }
+}
+```
+
+## **Get Favorite Food**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/favorites`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+[
+  {
+    "_id": "string unique",
+    "user": "string unique",
+    "food": {
+      "_id": "string unique",
+      "name": "string",
+      "image": "string",
+      "category": "string unique",
+      "cal": "number",
+      "protein": "number",
+      "carb": "number",
+      "fat": "number",
+      "carbon": "number",
+      "desc": "string",
+      "createdAt": "date",
+      "updatedAt": "date"
+    }
+  }
+]
+```
+
+## **Delete Favorite Food**
+
+**Request** :
+
+- Method : DELETE
+- Endpoint : `(base-url)/favorites/{:favorite_id}`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+{
+  "message": "favorite food data deleted successfully"
+}
+```
+
+# **Add Tracking of User**
+
+**Request** :
+
+- Method : POST
+- Endpoint : `(base-url)/tracking`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body :
+
+```json
+{
+  "food": [
+    {
+      "foodId": "string unique",
+      "portion": "number"
+    }
+  ]
+}
+```
+
+**Response** :
+
+```json
+{
+  "_id": "string unique",
+  "user": "string unique",
+  "tracking": {
+    "date": "date",
+    "food": [
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      }
+    ]
+  },
+  "totCarb": "number",
+  "totProtein": "number",
+  "totFat": "number",
+  "totCal": "number",
+  "totCarbon": "number"
+}
+```
+
+## **Get All Tracking of User**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/tracking`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+{
+  "_id": "string unique",
+  "user": "string unique",
+  "tracking": {
+    "date": "date",
+    "food": [
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      },
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      }
+    ]
+  },
+  "totCarb": "number",
+  "totProtein": "number",
+  "totFat": "number",
+  "totCal": "number"
+}
+```
+
+## **Get Today Tracking of User**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/tracking/today`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+{
+  "_id": "string unique",
+  "user": "string unique",
+  "tracking": {
+    "date": "date",
+    "food": [
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      },
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      }
+    ]
+  },
+  "totCarb": "number",
+  "totProtein": "number",
+  "totFat": "number",
+  "totCal": "number",
+  "totCarbon": "number"
+}
+```
+
+## **Get Tracking of User Per Date**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/tracking/{:date}`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+{
+  "_id": "string unique",
+  "user": "string unique",
+  "tracking": {
+    "date": "date",
+    "food": [
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      },
+      {
+        "foodId": {
+          "_id": "string unique",
+          "name": "string",
+          "image": "string",
+          "category": "string unique",
+          "cal": "number",
+          "protein": "number",
+          "carb": "number",
+          "fat": "number",
+          "desc": "100gram"
+        },
+        "portion": "number",
+        "time": "time"
+      }
+    ]
+  },
+  "totCarb": "number",
+  "totProtein": "number",
+  "totFat": "number",
+  "totCal": "number"
+}
+```
+
+# **Profile and Account**
+
+## **Get Profile**
+
+**Request** :
+
+- Method : GET
+- Endpoint : `(base-url)/profile`
+- Header : - Accept : application/json
+  **Response** :
+
+```json
+{
+  "_id": "string",
+  "username": "string",
+  "email": "string",
+  "gender": "string",
+  "status": "string",
+  "password": "string encrypted",
+  "tinggi": "number",
+  "berat": "number",
+  "levelAktivitas": {
+    "val": "number",
+    "ket": "string"
+  },
+  "umur": "number",
+  "caloriNeeded": "number",
+  "proteinNeeded": "number",
+  "fatNeeded": "number",
+  "carboNeeded": "number",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+## **Edit Profile**
+
+**Request** :
+
+- Method : PUT
+- Endpoint : `(base-url)/profile`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body : (example)
+  `json
+{
+    "username": "string",
+    "gender": "string",
+    "tinggi": "number",
+    "berat": "number",
+    "levelAktivitas": "number",
+    "umur": "number"
+}
+`
+  **Response** :
+
+```json
+{
+  "message": "profile has been changed successfully",
+  "changeSuccess": {
+    "username": "string",
+    "gender": "string",
+    "tinggi": "number",
+    "berat": "number",
+    "umur": "number",
+    "levelAktivitas": "number",
+    "caloriNeeded": "number",
+    "carboNeeded": "number",
+    "proteinNeeded": "number",
+    "fatNeeded": "number"
+  }
+}
+```
+
+## **Edit Account (Email and Password)**
+
+**Request** :
+
+- Method : PUT
+- Endpoint : `(base-url)/profile/account`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body :
+  `json
+{
+    "email": "string",
+    "currentPassword": "string",
+    "newPassword": "string",
+    "confirmPassword": "string"
+}
+`
+  **Response** :
+
+```json
+{
+  "message": "string",
+  "changed": {
+    "email": "string",
+    "password": "string encrypted"
+  }
+}
+```
+
+## **Change Password**
+
+**Request** :
+
+- Method : PUT
+- Endpoint : `(base-url)/profile/change-password`
+- Header :
+  - Content-Type : application/json
+  - Accept : application/json
+- Body : (example)
+  `json
+{
+    "currentPassword":"string",
+    "newPassword":"string",
+    "confirmPassword":"string"
+}
+`
+  **Response** :
+
+```json
+{
+  "message": "Password have been Changed successfully",
+  "success": {
+    "_id": "string",
+    "username": "string",
+    "email": "string",
+    "gender": "string",
+    "status": "string",
+    "password": "string encrypted",
+    "tinggi": "number",
+    "berat": "number",
+    "levelAktivitas": "number",
+    "umur": "number",
+    "caloriNeeded": "number",
+    "proteinNeeded": "number",
+    "fatNeeded": "number",
+    "carboNeeded": "number",
+    "createdAt": "date",
+    "updatedAt": "date"
+  }
+}
+```
