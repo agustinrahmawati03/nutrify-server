@@ -106,7 +106,8 @@ BASE URL :
   - Content-Type : application/json
   - Accept : application/json
 - Body :
-  ```json
+
+  ````json
 
       [
           {
@@ -135,6 +136,7 @@ BASE URL :
       ```
 
   **Response** :
+  ````
 
 ```json
 {
@@ -177,14 +179,14 @@ BASE URL :
   - Accept : application/json
 - Body : (example)
   `json
-    {
-        "cal": "number",
-        "protein": "number",
-        "carb": "number",
-        "fat": "number",
-        "carbon": "number",
-    }
-    `
+  {
+      "cal": "number",
+      "protein": "number",
+      "carb": "number",
+      "fat": "number",
+      "carbon": "number",
+  }
+  `
   **Response** :
 
 ```json
@@ -222,7 +224,7 @@ BASE URL :
     "cal": "number",
     "protein": "number",
     "carb": "number",
-    "fat": "number"
+    "fat": "number",
     "desc": "string",
     "createdAt": "date",
     "updatedAt": "date"

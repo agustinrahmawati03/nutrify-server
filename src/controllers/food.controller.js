@@ -10,4 +10,15 @@ const getAllFoods = async (req, res) => {
   }
 };
 
-module.exports = { getAllFoods };
+const addManyFoods = async (req, res) => {
+  try {
+    await Food.insertMany(req.body);
+    res.status(201).send({
+      message: 'food added successfully',
+    });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
+module.exports = { getAllFoods, addManyFoods };
