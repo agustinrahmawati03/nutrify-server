@@ -1,5 +1,4 @@
 const { tokenReturned } = require('../middleware/token');
-const foodModel = require('../models/food');
 const Tracking = require('../models/tracking');
 const { findByDate, totalNutri } = require('../service');
 
@@ -58,7 +57,7 @@ const addTracking = async (req, res) => {
       .json({ message: 'add new tracking success', body: dataSaved });
     // tambahkan kedatabase
   } catch (error) {
-    console.log(error);
+    res.status(500).send({ error: error.message });
   }
 };
 
@@ -108,11 +107,66 @@ const getTrackingToday = async (req, res) => {
         result,
       },
     });
-
-    // response tracking
   } catch (error) {
-    console.log(error);
+    res.status(500).send({ error: error.message });
   }
 };
 
-module.exports = { addTracking, getTrackingToday };
+const getTrackingByDate = async (req, res) => {
+  const { data } = tokenReturned(req, res);
+  const userId = data._id;
+
+  let { date } = req.body;
+  let dateTrack = null;
+  try {
+    // throw err when date not found
+    if (!date) {
+      return res
+        .status(400)
+        .send({ message: 'please choose the date !' });
+    }
+    // get data tracking by user
+    const tracking = await Tracking.findOne({
+      user: userId,
+    }).populate({
+      path: 'tracking',
+      populate: {
+        path: 'food',
+        populate: 'foodId',
+      },
+    });
+
+    // handle res when tracking null
+    if (tracking === null) {
+      return res.status(500).json({ message: 'tracking not found' });
+    }
+
+    // find data tracking by date
+
+    const dateTracking = findByDate(tracking.tracking, date);
+    if (dateTracking < 0) {
+      return res.status(500).json({ message: 'tracking not found' });
+    }
+
+    if (dateTracking > -1) {
+      dateTrack = tracking.tracking[dateTracking];
+    }
+    const result = totalNutri(dateTrack);
+
+    return res.status(200).json({
+      message: 'success',
+      body: {
+        _id: tracking._id,
+        user: tracking.user,
+        tracking: dateTrack,
+        result,
+      },
+    });
+
+    //
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+};
+
+module.exports = { addTracking, getTrackingToday, getTrackingByDate };
