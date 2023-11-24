@@ -1,7 +1,7 @@
 const { tokenReturned } = require('../middleware/token');
 const foodModel = require('../models/food');
 const Tracking = require('../models/tracking');
-const { findByDate } = require('../service');
+const { findByDate, totalNutri } = require('../service');
 
 const addTracking = async (req, res) => {
   try {
@@ -14,7 +14,7 @@ const addTracking = async (req, res) => {
 
     // find user
     const trackExist = await Tracking.findOne({ user: userId });
-    const tanggal = new Date('12-10-2023');
+    const tanggal = new Date();
     let today = tanggal.toLocaleDateString('fr-CA');
 
     const tracking = {
@@ -62,4 +62,57 @@ const addTracking = async (req, res) => {
   }
 };
 
-module.exports = { addTracking };
+const getTrackingToday = async (req, res) => {
+  // validitasi token
+  const { data } = tokenReturned(req, res);
+  const userId = data._id;
+  // get date
+
+  const tanggal = new Date();
+  let today = tanggal.toLocaleDateString('fr-CA');
+  let todayTrack = null;
+
+  try {
+    const tracking = await Tracking.findOne({
+      user: userId,
+    }).populate({
+      path: 'tracking',
+      populate: {
+        path: 'food',
+        populate: 'foodId',
+      },
+    });
+
+    // if today tracking is null
+    if (tracking === null) {
+      return res.status(201).json({
+        message: 'belum ada tracking',
+      });
+    }
+
+    // if today tracking is found
+    const todayTracking = findByDate(tracking.tracking, today);
+
+    if (todayTracking > -1) {
+      todayTrack = tracking.tracking[todayTracking];
+    }
+
+    const result = totalNutri(todayTrack);
+
+    res.status(200).json({
+      message: 'Get tracking success',
+      body: {
+        _id: tracking._id,
+        user: tracking.user,
+        tracking: todayTrack,
+        result,
+      },
+    });
+
+    // response tracking
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { addTracking, getTrackingToday };
