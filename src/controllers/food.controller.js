@@ -33,7 +33,7 @@ const getFoodByCategory = async (req, res) => {
 
     res.status(200).send({ message: 'success', body: food });
   } catch (error) {
-    console.log(error);
+    res.status(500).send({ message: error.message });
   }
 };
 
@@ -48,7 +48,7 @@ const getFoodByQuery = async (req, res) => {
       return res.send(food);
     }
   } catch (error) {
-    console.log(error);
+    res.status(500).send({ message: error.message });
   }
 };
 
