@@ -21,4 +21,20 @@ const addManyFoods = async (req, res) => {
   }
 };
 
-module.exports = { getAllFoods, addManyFoods };
+const getFoodByCategory = async (req, res) => {
+  try {
+    const food = await Food.find({
+      category: req.params.category,
+    }).populate('category');
+
+    if (food === null) {
+      res.status(400).json({ message: 'category not found' });
+    }
+
+    res.status(200).send({ message: 'success', body: food });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = { getAllFoods, addManyFoods, getFoodByCategory };
