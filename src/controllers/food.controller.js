@@ -37,4 +37,39 @@ const getFoodByCategory = async (req, res) => {
   }
 };
 
-module.exports = { getAllFoods, addManyFoods, getFoodByCategory };
+const getFoodByQuery = async (req, res) => {
+  try {
+    const food = await Food.find({
+      name: { $regex: req.query.name, $options: 'i' },
+    }).populate('category');
+    if (food.length == 0) {
+      return res.status(404).send({ message: 'Oops, Not Found' });
+    } else {
+      return res.send(food);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getFoodByID = async (req, res) => {
+  try {
+    const food = await Food.findOne({ _id: req.params.id }).populate(
+      'category'
+    );
+
+    return res.send(food);
+  } catch (error) {
+    return res.status(500).send({
+      message: 'opps food not found!',
+    });
+  }
+};
+
+module.exports = {
+  getAllFoods,
+  addManyFoods,
+  getFoodByCategory,
+  getFoodByQuery,
+  getFoodByID,
+};

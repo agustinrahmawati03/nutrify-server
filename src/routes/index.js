@@ -7,7 +7,7 @@ const trackingRoute = require('./tracking.router');
 const categoryRoute = require('./category');
 
 router.use('/', authRoute);
-router.use('/food', foodRoute);
+router.use('/foods', foodRoute);
 router.use('/', trackingRoute);
 router.use('/', categoryRoute);
 
