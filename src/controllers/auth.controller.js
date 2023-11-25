@@ -61,7 +61,7 @@ const signup = async (req, res) => {
       carboNeeded: carboNeeded,
       proteinNeeded: proteinNeeded,
       fatNeeded: fatNeeded,
-      statusBMI,
+      status : statusBMI,
     });
 
     await newUser.save();
@@ -80,7 +80,7 @@ const signup = async (req, res) => {
       carboNeeded: carboNeeded,
       proteinNeeded: proteinNeeded,
       fatNeeded: fatNeeded,
-      statusBMI,
+      status : statusBMI,
     };
 
     return res
