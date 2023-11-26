@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development nodemon ./src/server.js",
-    "prod": "cross-env NODE_ENV=production node ./src/server.js",
-    "start": "cross-env NODE_ENV=production node ./src/server.js"
+    "prod": "node ./src/server.js",
+    "start": "node ./src/server.js"
   },
   "keywords": [],
   "author": "C523-PS006",
