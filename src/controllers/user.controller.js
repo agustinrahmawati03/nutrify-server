@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const { tokenReturned } = require('../middleware/token');
+const bcrypt = require('bcryptjs');
 const { getLevelActivity, hitungBMI } = require('../service');
 
 
@@ -83,17 +84,45 @@ const editUserProfile = async (req, res) => {
     }
 };
 
-const editUserAccount = async (req, res) => {
- 
-};
-
 const changeUserPassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
 
+        const { data } = tokenReturned(req, res);
+
+        const currentUser = await User.findById(data._id)
+
+        if (!currentUser) {
+            return res.status(404).json({ message: 'User not found or Token Invalid' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, currentUser.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect password' });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        currentUser.password = hashedPassword;
+        await currentUser.save();
+
+        res.json({
+            message: 'Password updated successfully',
+            changeSuccess: currentUser
+            
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
 };
 
 module.exports = {
     getUserProfile,
     editUserProfile,
-    editUserAccount,
     changeUserPassword
 }
