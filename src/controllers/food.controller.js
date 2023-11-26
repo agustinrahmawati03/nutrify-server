@@ -4,9 +4,9 @@ const getAllFoods = async (req, res) => {
   try {
     const food = await Food.find();
 
-    res.status(200).send({ message: 'success', food });
+    return res.status(200).send({ message: 'success', food });
   } catch (error) {
-    res.status(500).send({ message: error.message });
+    return res.status(500).send({ message: error.message });
   }
 };
 
