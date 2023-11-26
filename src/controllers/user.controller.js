@@ -10,7 +10,7 @@ const getUserProfile = async (req, res) => {
 
         console.log("id : " + data);
         const currentUser = await User.findOne({
-            _id: data.id
+            _id: data._id
         });
 
         return res.status(200).send(
