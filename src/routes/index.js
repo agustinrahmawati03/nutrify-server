@@ -6,7 +6,7 @@ const foodRoute = require('./food.router');
 const trackingRoute = require('./tracking.router');
 const categoryRoute = require('./category.router');
 const userRoute  = require('./user.router');
-const favoriteRoute = require('./favorite');
+const favoriteRoute = require('./favorite.router');
 
 
 router.use('/', authRoute);
