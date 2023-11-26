@@ -77,9 +77,19 @@ const totalNutri = (data) => {
   return nutri;
 };
 
+const validateUserProfileData = (data) => {
+  const { username, gender, tinggi, berat, levelAktivitas, umur } = data;
+
+  if (!username || !gender || !tinggi || !berat || !levelAktivitas || !umur) {
+      return false;
+  }
+  return true;
+};
+
 module.exports = {
   getLevelActivity,
   hitungBMI,
   findByDate,
   totalNutri,
+  validateUserProfileData
 };
