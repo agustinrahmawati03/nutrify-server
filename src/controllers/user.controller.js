@@ -1,27 +1,20 @@
 const User = require('../models/user');
 const { tokenReturned } = require('../middleware/token');
 const bcrypt = require('bcryptjs');
-const { getLevelActivity, hitungBMI } = require('../service');
-
+const { getLevelActivity, hitungBMI, validateUserProfileData } = require('../service');
 
 const getUserProfile = async (req, res) => {
     try {
         const { data } = tokenReturned(req, res);
-
         const currentUser = await User.findById(data._id);
+        if (!currentUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-        return res.status(200).send(
-            {
-                message: 'Success',
-                profile: currentUser,
-            }
-        )
+        const { password, ...userWithoutPassword } = currentUser.toObject();
+        return res.status(200).json({ message: 'Success', profile: userWithoutPassword });
     } catch (error) {
-        res.status(200).send(
-            {
-                message: error
-            }
-        )
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -39,19 +32,21 @@ const editUserProfile = async (req, res) => {
             umur
         } = req.body;
 
-        // Find the user by ID
-        const currentUser = await User.findById(data._id)
+        if (!validateUserProfileData(req.body)) {
+            return res.status(400).json({ message: 'Invalid user profile data' });
+        }
+
+        const currentUser = await User.findById(data._id);
         if (!currentUser) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Update the user's profile data
-        if (username) currentUser.username = username;
-        if (gender) currentUser.gender = gender;
-        if (tinggi) currentUser.tinggi = tinggi;
-        if (berat) currentUser.berat = berat;
-        if (umur) currentUser.umur = umur;
-        if (levelAktivitas) currentUser.levelAktivitas = levelAktivitas;
+        currentUser.username = username;
+        currentUser.gender = gender;
+        currentUser.tinggi = tinggi;
+        currentUser.berat = berat;
+        currentUser.umur = umur;
+        currentUser.levelAktivitas = levelAktivitas;
 
         // Recalculate BMI and nutrition needs based on new data
         const statusBMI = hitungBMI(berat, tinggi);
@@ -70,39 +65,35 @@ const editUserProfile = async (req, res) => {
         currentUser.fatNeeded = fatNeeded;
         currentUser.status = statusBMI;
 
-        // Save the updated user profile
         await currentUser.save();
 
-        // Respond with updated user data
+        const { password, ...updatedUser } = currentUser.toObject();
         return res.json({
-            message: "profile has been changed successfully",
-            changeSuccess: currentUser,
+            message: "Profile updated successfully",
+            changeSuccess: updatedUser
         });
     } catch (error) {
-        res.status(500).send({ message: 'error' });
-        console.log(error);
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
 const changeUserPassword = async (req, res) => {
     try {
         const { currentPassword, newPassword, confirmPassword } = req.body;
-
         const { data } = tokenReturned(req, res);
-
-        const currentUser = await User.findById(data._id)
+        const currentUser = await User.findById(data._id);
 
         if (!currentUser) {
-            return res.status(404).json({ message: 'User not found or Token Invalid' });
+            return res.status(404).json({ message: 'User not found' });
         }
 
         const isMatch = await bcrypt.compare(currentPassword, currentUser.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Incorrect password' });
+            return res.status(400).json({ message: 'Incorrect current password' });
         }
-
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match' });
+            return res.status(400).json({ message: 'New passwords do not match' });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -110,10 +101,11 @@ const changeUserPassword = async (req, res) => {
         currentUser.password = hashedPassword;
         await currentUser.save();
 
+        const { password, ...userWithoutPassword } = currentUser.toObject();
         res.json({
             message: 'Password updated successfully',
-            changeSuccess: currentUser
-            
+            changeSuccess: userWithoutPassword
+
         });
     } catch (error) {
         console.error(error);
@@ -125,4 +117,4 @@ module.exports = {
     getUserProfile,
     editUserProfile,
     changeUserPassword
-}
+};
