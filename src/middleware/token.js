@@ -21,7 +21,7 @@ module.exports = {
         response.end();
       }
     } catch (error) {
-      response.status(500).send({ message: error.message });
+      response.status(500).send({ message: "Authorization Header Not Found" });
       response.end();
     }
   },

@@ -14,7 +14,7 @@ const signup = async (req, res) => {
       berat,
       umur,
       password,
-      levelAktivitas,
+      levelActivity,
     } = req.body;
 
     // check email is exist
@@ -27,7 +27,7 @@ const signup = async (req, res) => {
 
     // count body mass index
 
-    const levActivicty = getLevelActivity(levelAktivitas);
+    const levActivicty = getLevelActivity(levelActivity);
 
     // count nutrition needed
 
@@ -56,12 +56,12 @@ const signup = async (req, res) => {
       tinggi: tinggi,
       berat: berat,
       umur: umur,
-      levelAktivitas: levelAktivitas,
+      levelActivity: levelActivity,
       caloriNeeded: caloriNeeded,
       carboNeeded: carboNeeded,
       proteinNeeded: proteinNeeded,
       fatNeeded: fatNeeded,
-      status : statusBMI,
+      status: statusBMI,
     });
 
     await newUser.save();
@@ -75,12 +75,12 @@ const signup = async (req, res) => {
       tinggi: tinggi,
       berat: berat,
       umur: umur,
-      levelAktivitas: levelAktivitas,
+      levelActivity: levelActivity,
       caloriNeeded: caloriNeeded,
       carboNeeded: carboNeeded,
       proteinNeeded: proteinNeeded,
       fatNeeded: fatNeeded,
-      status : statusBMI,
+      status: statusBMI,
     };
 
     return res
@@ -131,7 +131,7 @@ const signin = async (req, res) => {
         tinggi: user.tinggi,
         berat: user.berat,
         umur: user.umur,
-        levelAktivitas: user.levelAktivitas,
+        levelActivity: user.levelActivity,
         caloriNeeded: user.caloriNeeded,
         carboNeeded: user.carboNeeded,
         proteinNeeded: user.proteinNeeded,
