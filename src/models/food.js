@@ -35,6 +35,12 @@ const foodSchema = new Schema(
     desc: {
       type: String,
     },
+    ingredients: {
+      type: String,
+    },
+    kelebihan: {
+      type: String,
+    },
   },
   {
     timestamps: true,

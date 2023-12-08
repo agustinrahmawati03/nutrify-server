@@ -6,13 +6,18 @@ const {
   getFoodByQuery,
   getFoodByID,
 } = require('../controllers/food.controller');
+const { tokenVerified, forUser } = require('../middleware/token');
 
 const foodRoute = express.Router();
 
-foodRoute.get('/', getAllFoods);
-foodRoute.post('/', addManyFoods);
-foodRoute.get('/:id', getFoodByID);
-foodRoute.get('/category/:category', getFoodByCategory);
-foodRoute.get('/search', getFoodByQuery);
+foodRoute.get('/', [tokenVerified, forUser], getAllFoods);
+foodRoute.post('/', [tokenVerified, forUser], addManyFoods);
+foodRoute.get('/:id', [tokenVerified, forUser], getFoodByID);
+foodRoute.get('/search', [tokenVerified, forUser], getFoodByQuery);
+foodRoute.get(
+  '/category/:category',
+  [tokenVerified, forUser],
+  getFoodByCategory
+);
 
 module.exports = foodRoute;

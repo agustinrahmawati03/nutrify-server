@@ -1,8 +1,9 @@
 const express = require('express');
 const allrouter = require('./routes');
 const database = require('./config/database');
-
 const app = express();
+var cors = require('cors');
+app.use(cors());
 
 const port = process.env.PORT || 9000;
 

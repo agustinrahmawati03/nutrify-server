@@ -138,14 +138,14 @@ const getTrackingByDate = async (req, res) => {
 
     // handle res when tracking null
     if (tracking === null) {
-      return res.status(500).json({ message: 'tracking not found' });
+      return res.status(404).json({ message: 'tracking not found' });
     }
 
     // find data tracking by date
 
     const dateTracking = findByDate(tracking.tracking, date);
     if (dateTracking < 0) {
-      return res.status(500).json({ message: 'tracking not found' });
+      return res.status(404).json({ message: 'tracking not found' });
     }
 
     if (dateTracking > -1) {
