@@ -22,7 +22,7 @@ const signup = async (req, res) => {
     const emailExist = await User.findOne({ email: email });
 
     if (emailExist !== null) {
-      return res.status(400).json({ message: 'email already used' });
+      return res.status(404).json({ message: 'email already used' });
     }
 
     // count body mass index
@@ -109,7 +109,7 @@ const signin = async (req, res) => {
     );
 
     if (passwordChecked === false) {
-      return res.status(400).json({ message: 'wrong password' });
+      return res.status(404).json({ message: 'wrong password' });
     }
 
     const token = {
