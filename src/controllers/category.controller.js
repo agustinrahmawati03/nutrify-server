@@ -5,7 +5,7 @@ const getCategories = async (req, res) => {
     const category = await Category.find();
     res.send(category);
   } catch (error) {
-    console.log(error);
+    res.status(500).send({ message: error });
   }
 };
 
@@ -22,7 +22,7 @@ const createCategory = async (req, res) => {
       data,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).send({ message: error });
   }
 };
 

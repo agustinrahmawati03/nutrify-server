@@ -17,11 +17,13 @@ module.exports = {
       if (verified) {
         next();
       } else {
-        response.status(500).send('token is invalid');
+        response.status(404).send('token is invalid');
         response.end();
       }
     } catch (error) {
-      response.status(500).send({ message: "Authorization Header Not Found" });
+      response
+        .status(404)
+        .send({ message: 'Authorization Header Not Found' });
       response.end();
     }
   },
@@ -33,11 +35,11 @@ module.exports = {
       if (verified.data.role === 'admin') {
         next();
       } else {
-        response.status(500).send('Unauthorized, forbidden');
+        response.status(404).send('Unauthorized, forbidden');
         response.end();
       }
     } catch (error) {
-      response.status(500).send({ message: error.message });
+      response.status(404).send({ message: error.message });
       response.end();
     }
   },
@@ -58,12 +60,12 @@ module.exports = {
         next();
       } else {
         response
-          .status(500)
+          .status(404)
           .send({ message: 'unauthorized, forbidden ' });
         response.end();
       }
     } catch (error) {
-      response.status(500).send({ error: error.message });
+      response.status(404).send({ error: error.message });
       response.end();
     }
   },

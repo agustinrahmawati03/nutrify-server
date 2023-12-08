@@ -6,7 +6,7 @@ const getAllFoods = async (req, res) => {
 
     return res.status(200).send({ message: 'success', food });
   } catch (error) {
-    return res.status(500).send({ message: error.message });
+    return res.status(404).send({ message: error.message });
   }
 };
 
@@ -28,7 +28,7 @@ const getFoodByCategory = async (req, res) => {
     }).populate('category');
 
     if (food === null) {
-      res.status(400).json({ message: 'category not found' });
+      res.status(404).json({ message: 'category not found' });
     }
 
     res.status(200).send({ message: 'success', body: food });
@@ -60,7 +60,7 @@ const getFoodByID = async (req, res) => {
 
     return res.send(food);
   } catch (error) {
-    return res.status(500).send({
+    return res.status(404).send({
       message: 'opps food not found!',
     });
   }
