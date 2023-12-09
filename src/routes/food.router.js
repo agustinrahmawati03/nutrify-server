@@ -12,8 +12,8 @@ const foodRoute = express.Router();
 
 foodRoute.get('/', [tokenVerified, forUser], getAllFoods);
 foodRoute.post('/', [tokenVerified, forUser], addManyFoods);
-foodRoute.get('/:id', [tokenVerified, forUser], getFoodByID);
 foodRoute.get('/search', [tokenVerified, forUser], getFoodByQuery);
+foodRoute.get('/:id', [tokenVerified, forUser], getFoodByID);
 foodRoute.get(
   '/category/:category',
   [tokenVerified, forUser],
