@@ -6,7 +6,7 @@ const getAllFoods = async (req, res) => {
 
     return res.status(200).send({ message: 'success', food });
   } catch (error) {
-    return res.status(404).send({ message: error.message });
+    return res.status(500).send({ message: error.message });
   }
 };
 
@@ -31,7 +31,7 @@ const getFoodByCategory = async (req, res) => {
       res.status(404).json({ message: 'category not found' });
     }
 
-    res.status(200).send({ message: 'success', body: food });
+    res.status(200).send({ message: 'success', food });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
@@ -42,11 +42,8 @@ const getFoodByQuery = async (req, res) => {
     const food = await Food.find({
       name: { $regex: req.query.name, $options: 'i' },
     }).populate('category');
-    if (food.length == 0) {
-      return res.status(404).send({ message: 'Oops, Not Found' });
-    } else {
-      return res.send(food);
-    }
+
+    return res.status(200).send({ message: 'success', food });
   } catch (error) {
     res.status(500).send({ message: error.message });
   }
