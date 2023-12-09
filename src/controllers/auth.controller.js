@@ -22,7 +22,7 @@ const signup = async (req, res) => {
     const emailExist = await User.findOne({ email: email });
 
     if (emailExist !== null) {
-      return res.status(404).json({ message: 'email already used' });
+      return res.status(409).json({ message: 'email already used' });
     }
 
     // count body mass index
@@ -36,7 +36,7 @@ const signup = async (req, res) => {
     if (gender === 'pria') {
       bmr = 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur;
     }
-    if (gender === 'perempuan') {
+    if (gender === 'wanita') {
       bmr = 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur;
     }
     const caloriNeeded = bmr * levActivicty;
@@ -84,7 +84,7 @@ const signup = async (req, res) => {
     };
 
     return res
-      .status(200)
+      .status(201)
       .json({ message: 'signup success', body: userData });
   } catch (error) {
     res.status(500).send({ message: 'error' });
@@ -109,7 +109,7 @@ const signin = async (req, res) => {
     );
 
     if (passwordChecked === false) {
-      return res.status(404).json({ message: 'wrong password' });
+      return res.status(401).json({ message: 'wrong password' });
     }
 
     const token = {

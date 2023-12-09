@@ -16,14 +16,11 @@ module.exports = {
       const verified = jwt.verify(token.split(' ')[1], SECRET_KEY);
       if (verified) {
         next();
-      } else {
-        response.status(404).send('token is invalid');
-        response.end();
       }
     } catch (error) {
       response
-        .status(404)
-        .send({ message: 'Authorization Header Not Found' });
+        .status(401)
+        .send({ message: error.message });
       response.end();
     }
   },
@@ -35,11 +32,11 @@ module.exports = {
       if (verified.data.role === 'admin') {
         next();
       } else {
-        response.status(404).send('Unauthorized, forbidden');
+        response.status(401).send('Unauthorized, forbidden');
         response.end();
       }
     } catch (error) {
-      response.status(404).send({ message: error.message });
+      response.status(401).send({ message: error.message });
       response.end();
     }
   },
@@ -60,12 +57,12 @@ module.exports = {
         next();
       } else {
         response
-          .status(404)
+          .status(401)
           .send({ message: 'unauthorized, forbidden ' });
         response.end();
       }
     } catch (error) {
-      response.status(404).send({ error: error.message });
+      response.status(401).send({ error: error.message });
       response.end();
     }
   },

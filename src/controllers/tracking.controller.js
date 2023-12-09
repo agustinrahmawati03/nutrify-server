@@ -84,8 +84,12 @@ const getTrackingToday = async (req, res) => {
 
     // if today tracking is null
     if (tracking === null) {
-      return res.status(201).json({
-        message: 'belum ada tracking',
+      return res.status(200).json({
+        message: 'No tracking found!',
+        body: {
+          tracking: {food:[]},
+          result: {},
+        },
       });
     }
 
@@ -138,14 +142,26 @@ const getTrackingByDate = async (req, res) => {
 
     // handle res when tracking null
     if (tracking === null) {
-      return res.status(404).json({ message: 'tracking not found' });
+      return res.status(200).json({
+        message: 'No tracking found!',
+        body: {
+          tracking: {food:[]},
+          result: {},
+        },
+      });
     }
 
     // find data tracking by date
 
     const dateTracking = findByDate(tracking.tracking, date);
     if (dateTracking < 0) {
-      return res.status(404).json({ message: 'tracking not found' });
+      return res.status(200).json({
+        message: 'No tracking found!',
+        body: {
+          tracking: {food:[]},
+          result: {},
+        },
+      });
     }
 
     if (dateTracking > -1) {

@@ -56,7 +56,7 @@ const editUserProfile = async (req, res) => {
     const bmr =
       gender === 'pria'
         ? 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur
-        : gender === 'perempuan'
+        : gender === 'wanita'
         ? 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur
         : 0;
 

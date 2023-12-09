@@ -8,7 +8,7 @@ const addFavoriteFood = async (req, res) => {
   try {
     if (favData.user !== userId) {
       return res
-        .status(404)
+        .status(401)
         .send({ message: 'unauthorized, forbidden' });
     }
     const favExist = await Favorite.findOne({
@@ -43,9 +43,9 @@ const getFavoriteFoods = async (req, res) => {
     const fav = await Favorite.find({ user: userId }).populate(
       'food'
     );
-    res.status(201).json({ message: 'success', body: fav });
+    res.status(200).json({ message: 'success', body: fav });
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 const deleteFavFood = async (req, res) => {
@@ -55,7 +55,7 @@ const deleteFavFood = async (req, res) => {
     });
     if (foodFav === null) {
       return res
-        .status(404)
+        .status(400)
         .json({ message: 'failed delete favorite food data' });
     }
     return res.status(200).json({
