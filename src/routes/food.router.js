@@ -10,7 +10,7 @@ const { tokenVerified, forUser } = require('../middleware/token');
 
 const foodRoute = express.Router();
 
-foodRoute.get('/', [tokenVerified, forUser], getAllFoods);
+foodRoute.get('/', getAllFoods);
 foodRoute.post('/', [tokenVerified, forUser], addManyFoods);
 foodRoute.get('/search', [tokenVerified, forUser], getFoodByQuery);
 foodRoute.get('/:id', [tokenVerified, forUser], getFoodByID);
