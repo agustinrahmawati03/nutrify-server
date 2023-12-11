@@ -65,12 +65,14 @@ const editUserProfile = async (req, res) => {
     const carboNeeded = (caloriNeeded * 0.65) / 4;
     const proteinNeeded = (caloriNeeded * 0.15) / 4;
     const fatNeeded = (caloriNeeded * 0.2) / 9;
+    let bbi = getBBIstatus(gender, tinggi, berat);
 
     currentUser.caloriNeeded = caloriNeeded;
     currentUser.carboNeeded = carboNeeded;
     currentUser.proteinNeeded = proteinNeeded;
     currentUser.fatNeeded = fatNeeded;
     currentUser.status = statusBMI;
+    currentUser.bbi = bbi;
 
     await currentUser.save();
 

@@ -1,7 +1,11 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const { tokenGenerated } = require('../middleware/token');
-const { getLevelActivity, hitungBMI } = require('../service');
+const {
+  getLevelActivity,
+  hitungBMI,
+  getBBIstatus,
+} = require('../service');
 
 const signup = async (req, res) => {
   try {
@@ -44,6 +48,8 @@ const signup = async (req, res) => {
     let proteinNeeded = (caloriNeeded * 0.15) / 4;
     let fatNeeded = (caloriNeeded * 0.2) / 4;
 
+    let bbi = getBBIstatus(gender, tinggi, berat);
+
     // encrypt the password
     password = bcrypt.hashSync(password, 10);
 
@@ -62,6 +68,7 @@ const signup = async (req, res) => {
       proteinNeeded: proteinNeeded,
       fatNeeded: fatNeeded,
       status: statusBMI,
+      bbi,
     });
 
     await newUser.save();
@@ -81,6 +88,7 @@ const signup = async (req, res) => {
       proteinNeeded: proteinNeeded,
       fatNeeded: fatNeeded,
       status: statusBMI,
+      bbi,
     };
 
     return res
@@ -136,6 +144,7 @@ const signin = async (req, res) => {
         carboNeeded: user.carboNeeded,
         proteinNeeded: user.proteinNeeded,
         fatNeeded: user.fatNeeded,
+        bbi: user.bbi,
       },
     };
 

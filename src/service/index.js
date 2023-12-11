@@ -78,12 +78,43 @@ const totalNutri = (data) => {
 };
 
 const validateUserProfileData = (data) => {
-  const { username, gender, tinggi, berat, levelAktivitas, umur } = data;
+  const { username, gender, tinggi, berat, levelAktivitas, umur } =
+    data;
 
-  if (!username || !gender || !tinggi || !berat || !levelAktivitas || !umur) {
-      return false;
+  if (
+    !username ||
+    !gender ||
+    !tinggi ||
+    !berat ||
+    !levelAktivitas ||
+    !umur
+  ) {
+    return false;
   }
   return true;
+};
+
+const getBBIstatus = (gender, tinggi, berat) => {
+  let bbi = {
+    value: 0,
+    status: '',
+  };
+  if (gender === 'pria') {
+    bbi.value = tinggi - 100 - (tinggi - 100) * 0.1;
+  }
+  if (gender === 'wanita') {
+    bbi.value = tinggi - 100 - (tinggi - 100) * 0.15;
+  }
+  let batasBawah = bbi.value - 1;
+  let batasAtas = bbi.value + 1;
+
+  if (batasBawah <= berat && batasAtas >= berat) {
+    bbi.status = 'Ideal';
+  } else {
+    bbi.status = 'Tidak Ideal';
+  }
+
+  return bbi;
 };
 
 module.exports = {
@@ -91,5 +122,6 @@ module.exports = {
   hitungBMI,
   findByDate,
   totalNutri,
-  validateUserProfileData
+  validateUserProfileData,
+  getBBIstatus,
 };

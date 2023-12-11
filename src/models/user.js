@@ -55,6 +55,9 @@ const userSchema = new Schema(
       type: Number,
       required: true,
     },
+    bbi: {
+      type: Object,
+    },
   },
   {
     timestamps: true,
