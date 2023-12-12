@@ -5,6 +5,7 @@ const {
   getLevelActivity,
   hitungBMI,
   validateUserProfileData,
+  getBBIstatus,
 } = require('../service');
 
 const getUserProfile = async (req, res) => {
