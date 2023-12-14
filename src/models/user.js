@@ -58,6 +58,12 @@ const userSchema = new Schema(
     bbi: {
       type: Object,
     },
+    resetPassword:{
+      lastSent: Date,
+      resetAttempts: Number,
+      verifyAttempts: Number,
+      verifyCode: String,
+    }
   },
   {
     timestamps: true,
