@@ -1,11 +1,13 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 const { tokenGenerated } = require('../middleware/token');
 const {
   getLevelActivity,
   hitungBMI,
   getBBIstatus,
 } = require('../service');
+const { sendVerificationCodeEmail } = require('../service/emailService');
 
 const signup = async (req, res) => {
   try {
@@ -96,7 +98,7 @@ const signup = async (req, res) => {
       .json({ message: 'signup success', body: userData });
   } catch (error) {
     res.status(500).send({ message: 'error' });
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -151,9 +153,114 @@ const signin = async (req, res) => {
     // make a response
     return res.status(200).json(data);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(500).send({ error });
   }
 };
+const requestCode = async (req, res) => {
+  try {
+    let { email } = req.body;
 
-module.exports = { signup, signin };
+    // Check if user exists
+    const user = await User.findOne({ email: email });
+    if (user === null) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // user can only send reset every verificationAttempts * 3 minutes
+    const lastSent = user.resetPassword?.lastSent ?? 0;
+    const now = Date.now();
+    // const now = new Date(Date.now() + 14 * 60 * 1000);
+    const diff = now - lastSent;
+    const diffMinutes = Math.floor(diff / 1000 / 60);
+    const verificationAttempts = user.resetPassword?.resetAttempts ?? 0;
+    if (verificationAttempts > 0 && diffMinutes < verificationAttempts * 3) {
+      const remainingMinutes = verificationAttempts * 3 - diffMinutes;
+      return res.status(200).json({
+        message: `You can send the verification code in ${remainingMinutes} minutes.`,
+      });
+    }
+
+    // Edit resetPassword on the database
+    user.resetPassword = {
+      lastSent: Date.now(),
+      verifyAttempts: 0,
+      resetAttempts: (user.resetPassword.resetAttempts ?? 0) + 1,
+      verifyCode: Math.floor(100000 + Math.random() * 900000),
+    };
+
+    await user.save();
+    console.log(user);
+
+    const status = await sendVerificationCodeEmail(email, user.resetPassword.verifyCode);
+    // const status = false;
+    // console.log(status, 'status');
+    return res.status(201).json({ message: 'Verification code has been sent to your email.', info: status });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+}
+
+const verifyCode = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email: email });
+    // console.log(user);
+    if (user === null) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // user only have 5 attempts to verify
+    if (user.resetPassword?.verifyAttempts >= 5) {
+      return res.status(401).json({ message: 'You have reached the maximum number of attempts.' });
+    }
+
+    if (user.resetPassword?.verifyCode !== code.toString()) {
+      user.resetPassword.verifyAttempts = (user.resetPassword.verifyAttempts ?? 0) + 1;
+      await user.save();
+
+      return res.status(401).json({ message: 'Invalid verification code!' });
+    }
+
+    return res.status(200).json({ message: 'Verification success!' });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+}
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+
+    // Check if user exists
+    const user = await User.findOne({ email: email });
+    if (user === null) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // user only have 5 attempts to verify
+    if (user.resetPassword?.verifyAttempts >= 5) {
+      return res.status(401).json({ message: 'You have reached the maximum number of attempts.' });
+    }
+
+    if (user.resetPassword?.verifyCode !== code.toString()) {
+      user.resetPassword.verifyAttempts = (user.resetPassword.verifyAttempts ?? 0) + 1;
+      await user.save();
+
+      return res.status(401).json({ message: 'Invalid verification code!' });
+    }
+
+    // cahneg password
+    user.password = bcrypt.hashSync(newPassword, 10);
+    user.resetPassword = undefined;
+    await user.save();
+
+    return res.status(200).json({ message: 'Your password has been reset successfully' });
+  } catch (error) {
+    return res.status(500).send({ error });
+  }
+}
+
+module.exports = { signup, signin, requestCode, verifyCode, resetPassword };
