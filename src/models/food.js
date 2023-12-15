@@ -12,10 +12,12 @@ const foodSchema = new Schema(
       type: String,
       required: true,
     },
-    category: {
-      type: String,
-      ref: 'Category',
-    },
+    categories: [
+      {
+        type: String,
+        ref: 'Category',
+      },
+    ],
     cal: {
       type: Number,
       required: true,

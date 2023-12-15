@@ -12,9 +12,16 @@ const getAllFoods = async (req, res) => {
 
 const addManyFoods = async (req, res) => {
   try {
-    await Food.insertMany(req.body);
+    // Ubah string ID kategori menjadi ObjectId
+    const foodsWithObjectId = req.body.map(food => ({
+      ...food,
+      categories: food.categories.map(category => category),
+    }));
+
+    await Food.insertMany(foodsWithObjectId);
+    
     res.status(201).send({
-      message: 'food added successfully',
+      message: 'Food added successfully',
     });
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -24,8 +31,8 @@ const addManyFoods = async (req, res) => {
 const getFoodByCategory = async (req, res) => {
   try {
     const food = await Food.find({
-      category: req.params.category,
-    }).populate('category');
+      categories: req.params.category,
+    });
 
     if (food === null) {
       res.status(404).json({ message: 'category not found' });
@@ -41,7 +48,7 @@ const getFoodByQuery = async (req, res) => {
   try {
     const food = await Food.find({
       name: { $regex: req.query.name, $options: 'i' },
-    }).populate('category');
+    });
 
     return res.status(200).send({ message: 'success', food });
   } catch (error) {
@@ -51,9 +58,7 @@ const getFoodByQuery = async (req, res) => {
 
 const getFoodByID = async (req, res) => {
   try {
-    const food = await Food.findOne({ _id: req.params.id }).populate(
-      'category'
-    );
+    const food = await Food.findOne({ _id: req.params.id });
 
     return res.send(food);
   } catch (error) {
