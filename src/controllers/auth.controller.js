@@ -48,7 +48,7 @@ const signup = async (req, res) => {
     const caloriNeeded = bmr * levActivicty;
     let carboNeeded = (caloriNeeded * 0.65) / 4;
     let proteinNeeded = (caloriNeeded * 0.15) / 4;
-    let fatNeeded = (caloriNeeded * 0.2) / 4;
+    let fatNeeded = (caloriNeeded * 0.2) / 9;
 
     let bbi = getBBIstatus(gender, tinggi, berat);
 
