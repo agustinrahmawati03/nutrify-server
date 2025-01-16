@@ -5,14 +5,16 @@ const {
   addExercise,
   getAllExercises,
   getExerciseById,
-  deleteExercise,
   getExerciseRecommendations,
+  updateExercise,
+  deleteExercise,
 } = require("../controllers/exercise.controller");
 
 exerciseRoute.post("/", addExercise);
 exerciseRoute.get("/", getAllExercises);
 exerciseRoute.get("/recommendations", getExerciseRecommendations);
 exerciseRoute.get("/:id", getExerciseById);
+exerciseRoute.put("/:id", updateExercise);
 exerciseRoute.delete("/:id", deleteExercise);
 
 module.exports = exerciseRoute;

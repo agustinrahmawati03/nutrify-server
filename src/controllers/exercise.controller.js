@@ -90,6 +90,36 @@ const getExerciseRecommendations = async (req, res) => {
   }
 };
 
+const updateExercise = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, min_bbi, max_bbi, duration, description } = req.body;
+
+    if (!name || !min_bbi || !max_bbi || !duration || !description) {
+      return res.status(400).send({ message: "All fields are required" });
+    }
+
+    const updatedExercise = await Exercise.findByIdAndUpdate(
+      id,
+      { name, min_bbi, max_bbi, duration, description },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedExercise) {
+      return res.status(404).send({ message: "Exercise not found" });
+    }
+
+    res.status(200).send({
+      message: "Exercise updated successfully",
+      data: {
+        exercise: updatedExercise,
+      }
+    });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+};
+
 const deleteExercise = async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,6 +144,7 @@ module.exports = {
   addExercise,
   getAllExercises,
   getExerciseById,
-  deleteExercise,
   getExerciseRecommendations,
+  updateExercise,
+  deleteExercise,
 };
