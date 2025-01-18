@@ -1,6 +1,7 @@
 const express = require("express");
 
 const exerciseRoute = express.Router();
+const { tokenVerified, forUser, onlyAdmin } = require('../middleware/token');
 const {
   addExercise,
   getAllExercises,
@@ -12,7 +13,7 @@ const {
 
 exerciseRoute.post("/", addExercise);
 exerciseRoute.get("/", getAllExercises);
-exerciseRoute.get("/recommendations", getExerciseRecommendations);
+exerciseRoute.get("/recommendations", [tokenVerified, forUser], getExerciseRecommendations);
 exerciseRoute.get("/:id", getExerciseById);
 exerciseRoute.put("/:id", updateExercise);
 exerciseRoute.delete("/:id", deleteExercise);

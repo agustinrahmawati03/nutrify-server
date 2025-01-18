@@ -1,5 +1,6 @@
+const { tokenReturned } = require('../middleware/token');
 const Exercise = require("../models/exercise");
-
+const User = require("../models/user");
 const addExercise = async (req, res) => {
   try {
     // Ambil data dari request body
@@ -67,12 +68,10 @@ const getExerciseById = async (req, res) => {
 
 const getExerciseRecommendations = async (req, res) => {
   try {
-    const { bbi } = req.query;
-
-    if (!bbi) {
-      return res.status(400).send({ message: "BBI is required" });
-    }
-
+    const { data } = tokenReturned(req, res);
+    const userId = data._id;
+    const user = await User.findById(userId);
+    const bbi = user.bbi.value;
     // Find exercises that match the BBI range
     const recommendedExercises = await Exercise.find({
       min_bbi: { $lte: parseFloat(bbi) },
