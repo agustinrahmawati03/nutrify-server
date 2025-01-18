@@ -124,7 +124,7 @@ const signin = async (req, res) => {
 
     const token = {
       _id: user._id,
-      role: 'user',
+      role: user.role || 'user',
     };
 
     const tokenCreated = tokenGenerated(token);
