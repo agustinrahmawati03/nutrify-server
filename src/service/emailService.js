@@ -3,13 +3,26 @@ const util = require('util');
 const nodemailer = require('nodemailer');
 
 // Konfigurasi transporter dengan informasi SMTP dari file .env
+// const transporter = nodemailer.createTransport({
+//     host: process.env.SMTP_HOST,
+//     port: process.env.SMTP_PORT,
+//     // secure: true, // true untuk port 465
+//     auth: {
+//         user: process.env.SMTP_USER,
+//         pass: process.env.SMTP_PASS,
+//     },
+// });
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: true, // true untuk port 465
+    secure: false, // Set to false to use STARTTLS (TLS upgrade over standard port)
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
+    },
+    tls: {
+        // Add TLS options if required
+        rejectUnauthorized: false, // Skip verifying server certificate (if needed)
     },
 });
 const sendMailPromise = util.promisify(transporter.sendMail).bind(transporter);
