@@ -27,6 +27,11 @@ const userSchema = new Schema(
       maxlength: 255,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['admin', 'user'],
+      default: 'user',
+    },
     tinggi: {
       type: Number,
       maxlength: 3,
@@ -58,12 +63,12 @@ const userSchema = new Schema(
     bbi: {
       type: Object,
     },
-    resetPassword:{
+    resetPassword: {
       lastSent: Date,
       resetAttempts: Number,
       verifyAttempts: Number,
       verifyCode: String,
-    }
+    },
   },
   {
     timestamps: true,
