@@ -2,7 +2,7 @@ const User = require('../models/user');
 const Tracking = require('../models/tracking');
 const Reminder = require('../models/reminder');
 
-const collectUsers = async () => {
+const collectUsers = async (req, res) => {
   try {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -27,7 +27,14 @@ const collectUsers = async () => {
     }));
 
     await Reminder.insertMany(reminders);
-    return reminders;
+    if (res) {
+      res.status(200).json({
+        message: "Reminder collected successfully",
+        data: { reminders }
+      })
+    } else {
+      return reminders;
+    }
   } catch (error) {
     throw error;
   }
