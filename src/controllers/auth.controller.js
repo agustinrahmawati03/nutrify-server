@@ -2,12 +2,8 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const { tokenGenerated } = require('../middleware/token');
-const {
-  getLevelActivity,
-  hitungBMI,
-  getBBIstatus,
-} = require('../service');
-const { sendVerificationCodeEmail } = require('../service/emailService');
+const { getLevelActivity, hitungBMI, getBBIstatus } = require('../service');
+const { sendVerificationCodeEmail } = require('../service/mailer');
 
 const signup = async (req, res) => {
   try {
@@ -55,6 +51,13 @@ const signup = async (req, res) => {
     // encrypt the password
     password = bcrypt.hashSync(password, 10);
 
+    const OTP = Math.floor(100000 + Math.random() * 900000);
+    const info = sendVerificationCodeEmail(
+      email,
+      OTP,
+      'Verify Your Registration'
+    );
+
     // save to database
     const newUser = new User({
       username: username,
@@ -71,6 +74,13 @@ const signup = async (req, res) => {
       fatNeeded: fatNeeded,
       status: statusBMI,
       bbi,
+      verification: {
+        status: false,
+        lastSent: Date.now(),
+        verifyAttempts: 0,
+        resetAttempts: 0,
+        verifyCode: OTP,
+      },
     });
 
     await newUser.save();
@@ -93,9 +103,7 @@ const signup = async (req, res) => {
       bbi,
     };
 
-    return res
-      .status(201)
-      .json({ message: 'signup success', body: userData });
+    return res.status(201).json({ message: 'signup success', body: userData });
   } catch (error) {
     res.status(500).send({ message: 'error' });
     // console.log(error);
@@ -113,10 +121,7 @@ const signin = async (req, res) => {
       return res.status(404).json({ message: 'user not found' });
     }
 
-    const passwordChecked = bcrypt.compareSync(
-      password,
-      user.password
-    );
+    const passwordChecked = bcrypt.compareSync(password, user.password);
 
     if (passwordChecked === false) {
       return res.status(401).json({ message: 'wrong password' });
@@ -157,78 +162,103 @@ const signin = async (req, res) => {
     return res.status(500).send({ error });
   }
 };
+
 const requestCode = async (req, res) => {
   try {
-    let { email } = req.body;
+    let { email, type = 'forget-password' } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email: email });
-    if (user === null) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // user can only send reset every verificationAttempts * 3 minutes
-    const lastSent = user.resetPassword?.lastSent ?? 0;
+    // Determine which property to use
+    const targetProperty =
+      type === 'register' ? 'verification' : 'resetPassword';
+    const lastSent = user[targetProperty]?.lastSent ?? 0;
     const now = Date.now();
-    // const now = new Date(Date.now() + 14 * 60 * 1000);
-    const diff = now - lastSent;
-    const diffMinutes = Math.floor(diff / 1000 / 60);
-    const verificationAttempts = user.resetPassword?.resetAttempts ?? 0;
-    if (verificationAttempts > 0 && diffMinutes < verificationAttempts * 3) {
-      const remainingMinutes = verificationAttempts * 3 - diffMinutes;
+    const diffMinutes = Math.floor((now - lastSent) / 1000 / 60);
+    const attempts = user[targetProperty]?.resetAttempts ?? 0;
+
+    // Enforce cooldown period
+    if (attempts > 0 && diffMinutes < attempts * 3) {
+      const remainingMinutes = attempts * 3 - diffMinutes;
       return res.status(200).json({
         message: `You can send the verification code in ${remainingMinutes} minutes.`,
       });
     }
 
-    // Edit resetPassword on the database
-    user.resetPassword = {
-      lastSent: Date.now(),
+    // Generate OTP and update user record
+    const OTP = Math.floor(100000 + Math.random() * 900000);
+    user[targetProperty] = {
+      lastSent: now,
       verifyAttempts: 0,
-      resetAttempts: (user.resetPassword.resetAttempts ?? 0) + 1,
-      verifyCode: Math.floor(100000 + Math.random() * 900000),
+      resetAttempts: (user[targetProperty]?.resetAttempts ?? 0) + 1,
+      verifyCode: OTP,
     };
+    if (type == 'register') {
+      user.verification.status = false;
+    }
 
     await user.save();
-    console.log(user);
 
-    const status = await sendVerificationCodeEmail(email, user.resetPassword.verifyCode);
-    // const status = false;
-    // console.log(status, 'status');
-    return res.status(201).json({ message: 'Verification code has been sent to your email.', info: status });
+    const status = await sendVerificationCodeEmail(
+      email,
+      OTP,
+      type == 'register'
+        ? 'Verify Your Registration'
+        : 'Nutrify Password Reset Verification'
+    );
+    return res.status(201).json({
+      message: 'Verification code has been sent to your email.',
+      info: status,
+    });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
-}
+};
 
 const verifyCode = async (req, res) => {
   try {
-    const { email, code } = req.body;
+    let { email, code, type = 'forget-password' } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email: email });
-    // console.log(user);
-    if (user === null) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // user only have 5 attempts to verify
-    if (user.resetPassword?.verifyAttempts >= 5) {
-      return res.status(401).json({ message: 'You have reached the maximum number of attempts.' });
+    // Determine which property to use
+    const targetProperty =
+      type === 'register' ? 'verification' : 'resetPassword';
+
+    // User only has 5 attempts
+    if (user[targetProperty]?.verifyAttempts >= 5) {
+      return res.status(401).json({
+        message: 'You have reached the maximum number of attempts.',
+      });
     }
 
-    if (user.resetPassword?.verifyCode !== code.toString()) {
-      user.resetPassword.verifyAttempts = (user.resetPassword.verifyAttempts ?? 0) + 1;
+    // Check if code matches
+    if (user[targetProperty]?.verifyCode !== code.toString()) {
+      user[targetProperty].verifyAttempts =
+        (user[targetProperty]?.verifyAttempts ?? 0) + 1;
       await user.save();
-
       return res.status(401).json({ message: 'Invalid verification code!' });
+    }
+
+    // If type is register, update verification status
+    if (type === 'register') {
+      user.verification.status = true;
+      await user.save();
     }
 
     return res.status(200).json({ message: 'Verification success!' });
   } catch (error) {
-    return res.status(500).send({ error });
+    return res.status(500).send({ error: error.message });
   }
-}
+};
 
 const resetPassword = async (req, res) => {
   try {
@@ -242,11 +272,14 @@ const resetPassword = async (req, res) => {
 
     // user only have 5 attempts to verify
     if (user.resetPassword?.verifyAttempts >= 5) {
-      return res.status(401).json({ message: 'You have reached the maximum number of attempts.' });
+      return res.status(401).json({
+        message: 'You have reached the maximum number of attempts.',
+      });
     }
 
     if (user.resetPassword?.verifyCode !== code.toString()) {
-      user.resetPassword.verifyAttempts = (user.resetPassword.verifyAttempts ?? 0) + 1;
+      user.resetPassword.verifyAttempts =
+        (user.resetPassword.verifyAttempts ?? 0) + 1;
       await user.save();
 
       return res.status(401).json({ message: 'Invalid verification code!' });
@@ -257,10 +290,12 @@ const resetPassword = async (req, res) => {
     user.resetPassword = undefined;
     await user.save();
 
-    return res.status(200).json({ message: 'Your password has been reset successfully' });
+    return res
+      .status(200)
+      .json({ message: 'Your password has been reset successfully' });
   } catch (error) {
     return res.status(500).send({ error });
   }
-}
+};
 
 module.exports = { signup, signin, requestCode, verifyCode, resetPassword };
