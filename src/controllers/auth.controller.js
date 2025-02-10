@@ -7,7 +7,7 @@ const { sendVerificationCodeEmail } = require('../service/mailer');
 
 const signup = async (req, res) => {
   try {
-    // get data from user
+    // Get data from request
     let {
       email,
       username,
@@ -19,94 +19,96 @@ const signup = async (req, res) => {
       levelActivity,
     } = req.body;
 
-    // check email is exist
+    // Check if email already exists
+    let user = await User.findOne({ email });
 
-    const emailExist = await User.findOne({ email: email });
+    if (user) {
+      if (user.verification?.status) {
+        return res
+          .status(409)
+          .json({ message: 'Email is already verified and in use.' });
+      }
 
-    if (emailExist !== null) {
-      return res.status(409).json({ message: 'email already used' });
+      // If user exists but is not verified, update their data
+      user.username = username;
+      user.gender = gender;
+      user.tinggi = tinggi;
+      user.berat = berat;
+      user.umur = umur;
+      user.levelActivity = levelActivity;
+    } else {
+      // If email does not exist, create a new user
+      user = new User({
+        email,
+        username,
+        gender,
+        tinggi,
+        berat,
+        umur,
+        levelActivity,
+      });
     }
 
-    // count body mass index
-
+    // Compute nutrition needs
     const levActivicty = getLevelActivity(levelActivity);
+    const statusBMI = hitungBMI(berat, tinggi);
+    const bbi = getBBIstatus(gender, tinggi, berat);
 
-    // count nutrition needed
+    let bmr =
+      gender === 'pria'
+        ? 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur
+        : 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur;
 
-    let bmr = 0;
-    let statusBMI = hitungBMI(berat, tinggi);
-    if (gender === 'pria') {
-      bmr = 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur;
-    }
-    if (gender === 'wanita') {
-      bmr = 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur;
-    }
-    const caloriNeeded = bmr * levActivicty;
-    let carboNeeded = (caloriNeeded * 0.65) / 4;
-    let proteinNeeded = (caloriNeeded * 0.15) / 4;
-    let fatNeeded = (caloriNeeded * 0.2) / 9;
+    user.caloriNeeded = bmr * levActivicty;
+    user.carboNeeded = (user.caloriNeeded * 0.65) / 4;
+    user.proteinNeeded = (user.caloriNeeded * 0.15) / 4;
+    user.fatNeeded = (user.caloriNeeded * 0.2) / 9;
+    user.status = statusBMI;
+    user.bbi = bbi;
 
-    let bbi = getBBIstatus(gender, tinggi, berat);
+    // Hash password before saving
+    user.password = bcrypt.hashSync(password, 10);
 
-    // encrypt the password
-    password = bcrypt.hashSync(password, 10);
-
+    // Generate OTP for verification
     const OTP = Math.floor(100000 + Math.random() * 900000);
-    const info = sendVerificationCodeEmail(
-      email,
-      OTP,
-      'Verify Your Registration'
-    );
-
-    // save to database
-    const newUser = new User({
-      username: username,
-      email: email,
-      gender: gender,
-      password: password,
-      tinggi: tinggi,
-      berat: berat,
-      umur: umur,
-      levelActivity: levelActivity,
-      caloriNeeded: caloriNeeded,
-      carboNeeded: carboNeeded,
-      proteinNeeded: proteinNeeded,
-      fatNeeded: fatNeeded,
-      status: statusBMI,
-      bbi,
-      verification: {
-        status: false,
-        lastSent: Date.now(),
-        verifyAttempts: 0,
-        resetAttempts: 0,
-        verifyCode: OTP,
-      },
-    });
-
-    await newUser.save();
-
-    // make a response
-    const userData = {
-      username: username,
-      email: email,
-      gender: gender,
-      password: password,
-      tinggi: tinggi,
-      berat: berat,
-      umur: umur,
-      levelActivity: levelActivity,
-      caloriNeeded: caloriNeeded,
-      carboNeeded: carboNeeded,
-      proteinNeeded: proteinNeeded,
-      fatNeeded: fatNeeded,
-      status: statusBMI,
-      bbi,
+    user.verification = {
+      status: false,
+      lastSent: Date.now(),
+      verifyAttempts: 0,
+      resetAttempts: 0,
+      verifyCode: OTP,
     };
 
-    return res.status(201).json({ message: 'signup success', body: userData });
+    await sendVerificationCodeEmail(email, OTP, 'Verify Your Registration');
+
+    // Save or update user in database
+    await user.save();
+
+    // Response payload (excluding sensitive data like password)
+    const userData = {
+      username: user.username,
+      email: user.email,
+      gender: user.gender,
+      tinggi: user.tinggi,
+      berat: user.berat,
+      umur: user.umur,
+      levelActivity: user.levelActivity,
+      caloriNeeded: user.caloriNeeded,
+      carboNeeded: user.carboNeeded,
+      proteinNeeded: user.proteinNeeded,
+      fatNeeded: user.fatNeeded,
+      status: user.status,
+      bbi: user.bbi,
+    };
+
+    return res.status(201).json({
+      message: 'Signup successful. Please verify your email.',
+      body: userData,
+    });
   } catch (error) {
-    res.status(500).send({ message: 'error' });
-    // console.log(error);
+    return res
+      .status(500)
+      .send({ message: 'Error processing request', error: error.message });
   }
 };
 
