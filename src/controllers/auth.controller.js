@@ -11,7 +11,7 @@ const { sendVerificationCodeEmail } = require('../service/mailer/index');
 
 const signup = async (req, res) => {
   try {
-    // get data from user
+    // Get data from request
     let {
       email,
       username,
@@ -23,82 +23,96 @@ const signup = async (req, res) => {
       levelActivity,
     } = req.body;
 
-    // check email is exist
+    // Check if email already exists
+    let user = await User.findOne({ email });
 
-    const emailExist = await User.findOne({ email: email });
+    if (user) {
+      if (user.verification?.status) {
+        return res
+          .status(409)
+          .json({ message: 'Email is already verified and in use.' });
+      }
 
-    if (emailExist !== null) {
-      return res.status(409).json({ message: 'email already used' });
+      // If user exists but is not verified, update their data
+      user.username = username;
+      user.gender = gender;
+      user.tinggi = tinggi;
+      user.berat = berat;
+      user.umur = umur;
+      user.levelActivity = levelActivity;
+    } else {
+      // If email does not exist, create a new user
+      user = new User({
+        email,
+        username,
+        gender,
+        tinggi,
+        berat,
+        umur,
+        levelActivity,
+      });
     }
 
-    // count body mass index
-
+    // Compute nutrition needs
     const levActivicty = getLevelActivity(levelActivity);
+    const statusBMI = hitungBMI(berat, tinggi);
+    const bbi = getBBIstatus(gender, tinggi, berat);
 
-    // count nutrition needed
+    let bmr =
+      gender === 'pria'
+        ? 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur
+        : 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur;
 
-    let bmr = 0;
-    let statusBMI = hitungBMI(berat, tinggi);
-    if (gender === 'pria') {
-      bmr = 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur;
-    }
-    if (gender === 'wanita') {
-      bmr = 655 + 9.5 * berat + 1.8 * tinggi - 4.7 * umur;
-    }
-    const caloriNeeded = bmr * levActivicty;
-    let carboNeeded = (caloriNeeded * 0.65) / 4;
-    let proteinNeeded = (caloriNeeded * 0.15) / 4;
-    let fatNeeded = (caloriNeeded * 0.2) / 9;
+    user.caloriNeeded = bmr * levActivicty;
+    user.carboNeeded = (user.caloriNeeded * 0.65) / 4;
+    user.proteinNeeded = (user.caloriNeeded * 0.15) / 4;
+    user.fatNeeded = (user.caloriNeeded * 0.2) / 9;
+    user.status = statusBMI;
+    user.bbi = bbi;
 
-    let bbi = getBBIstatus(gender, tinggi, berat);
+    // Hash password before saving
+    user.password = bcrypt.hashSync(password, 10);
 
-    // encrypt the password
-    password = bcrypt.hashSync(password, 10);
-
-    // save to database
-    const newUser = new User({
-      username: username,
-      email: email,
-      gender: gender,
-      password: password,
-      tinggi: tinggi,
-      berat: berat,
-      umur: umur,
-      levelActivity: levelActivity,
-      caloriNeeded: caloriNeeded,
-      carboNeeded: carboNeeded,
-      proteinNeeded: proteinNeeded,
-      fatNeeded: fatNeeded,
-      status: statusBMI,
-      bbi,
-    });
-
-    await newUser.save();
-
-    // make a response
-    const userData = {
-      username: username,
-      email: email,
-      gender: gender,
-      password: password,
-      tinggi: tinggi,
-      berat: berat,
-      umur: umur,
-      levelActivity: levelActivity,
-      caloriNeeded: caloriNeeded,
-      carboNeeded: carboNeeded,
-      proteinNeeded: proteinNeeded,
-      fatNeeded: fatNeeded,
-      status: statusBMI,
-      bbi,
+    // Generate OTP for verification
+    const OTP = Math.floor(100000 + Math.random() * 900000);
+    user.verification = {
+      status: false,
+      lastSent: Date.now(),
+      verifyAttempts: 0,
+      resetAttempts: 0,
+      verifyCode: OTP,
     };
 
-    return res
-      .status(201)
-      .json({ message: 'signup success', body: userData });
+    await sendVerificationCodeEmail(email, OTP, 'Verify Your Registration');
+
+    // Save or update user in database
+    await user.save();
+
+    // Response payload (excluding sensitive data like password)
+    const userData = {
+      username: user.username,
+      email: user.email,
+      gender: user.gender,
+      tinggi: user.tinggi,
+      berat: user.berat,
+      umur: user.umur,
+      levelActivity: user.levelActivity,
+      caloriNeeded: user.caloriNeeded,
+      carboNeeded: user.carboNeeded,
+      proteinNeeded: user.proteinNeeded,
+      fatNeeded: user.fatNeeded,
+      status: user.status,
+      bbi: user.bbi,
+    };
+
+    return res.status(201).json({
+      message: 'Signup successful. Please verify your email.',
+      body: userData,
+    });
   } catch (error) {
-    res.status(500).send({ message: 'error' });
-    // console.log(error);
+    return res
+      .status(500)
+      .send({ message: 'Error processing request', error: error.message });
   }
 };
 
@@ -113,10 +127,7 @@ const signin = async (req, res) => {
       return res.status(404).json({ message: 'user not found' });
     }
 
-    const passwordChecked = bcrypt.compareSync(
-      password,
-      user.password
-    );
+    const passwordChecked = bcrypt.compareSync(password, user.password);
 
     if (passwordChecked === false) {
       return res.status(401).json({ message: 'wrong password' });
@@ -157,78 +168,103 @@ const signin = async (req, res) => {
     return res.status(500).send({ error });
   }
 };
+
 const requestCode = async (req, res) => {
   try {
-    let { email } = req.body;
+    let { email, type = 'forget-password' } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email: email });
-    if (user === null) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // user can only send reset every verificationAttempts * 3 minutes
-    const lastSent = user.resetPassword?.lastSent ?? 0;
+    // Determine which property to use
+    const targetProperty =
+      type === 'register' ? 'verification' : 'resetPassword';
+    const lastSent = user[targetProperty]?.lastSent ?? 0;
     const now = Date.now();
-    // const now = new Date(Date.now() + 14 * 60 * 1000);
-    const diff = now - lastSent;
-    const diffMinutes = Math.floor(diff / 1000 / 60);
-    const verificationAttempts = user.resetPassword?.resetAttempts ?? 0;
-    if (verificationAttempts > 0 && diffMinutes < verificationAttempts * 3) {
-      const remainingMinutes = verificationAttempts * 3 - diffMinutes;
+    const diffMinutes = Math.floor((now - lastSent) / 1000 / 60);
+    const attempts = user[targetProperty]?.resetAttempts ?? 0;
+
+    // Enforce cooldown period
+    if (attempts > 0 && diffMinutes < attempts * 3) {
+      const remainingMinutes = attempts * 3 - diffMinutes;
       return res.status(200).json({
         message: `You can send the verification code in ${remainingMinutes} minutes.`,
       });
     }
 
-    // Edit resetPassword on the database
-    user.resetPassword = {
-      lastSent: Date.now(),
+    // Generate OTP and update user record
+    const OTP = Math.floor(100000 + Math.random() * 900000);
+    user[targetProperty] = {
+      lastSent: now,
       verifyAttempts: 0,
-      resetAttempts: (user.resetPassword.resetAttempts ?? 0) + 1,
-      verifyCode: Math.floor(100000 + Math.random() * 900000),
+      resetAttempts: (user[targetProperty]?.resetAttempts ?? 0) + 1,
+      verifyCode: OTP,
     };
+    if (type == 'register') {
+      user.verification.status = false;
+    }
 
     await user.save();
-    console.log(user);
 
-    const status = await sendVerificationCodeEmail(email, user.resetPassword.verifyCode);
-    // const status = false;
-    // console.log(status, 'status');
-    return res.status(201).json({ message: 'Verification code has been sent to your email.', info: status });
+    const status = await sendVerificationCodeEmail(
+      email,
+      OTP,
+      type == 'register'
+        ? 'Verify Your Registration'
+        : 'Nutrify Password Reset Verification'
+    );
+    return res.status(201).json({
+      message: 'Verification code has been sent to your email.',
+      info: status,
+    });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
-}
+};
 
 const verifyCode = async (req, res) => {
   try {
-    const { email, code } = req.body;
+    let { email, code, type = 'forget-password' } = req.body;
 
     // Check if user exists
-    const user = await User.findOne({ email: email });
-    // console.log(user);
-    if (user === null) {
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // user only have 5 attempts to verify
-    if (user.resetPassword?.verifyAttempts >= 5) {
-      return res.status(401).json({ message: 'You have reached the maximum number of attempts.' });
+    // Determine which property to use
+    const targetProperty =
+      type === 'register' ? 'verification' : 'resetPassword';
+
+    // User only has 5 attempts
+    if (user[targetProperty]?.verifyAttempts >= 5) {
+      return res.status(401).json({
+        message: 'You have reached the maximum number of attempts.',
+      });
     }
 
-    if (user.resetPassword?.verifyCode !== code.toString()) {
-      user.resetPassword.verifyAttempts = (user.resetPassword.verifyAttempts ?? 0) + 1;
+    // Check if code matches
+    if (user[targetProperty]?.verifyCode !== code.toString()) {
+      user[targetProperty].verifyAttempts =
+        (user[targetProperty]?.verifyAttempts ?? 0) + 1;
       await user.save();
-
       return res.status(401).json({ message: 'Invalid verification code!' });
+    }
+
+    // If type is register, update verification status
+    if (type === 'register') {
+      user.verification.status = true;
+      await user.save();
     }
 
     return res.status(200).json({ message: 'Verification success!' });
   } catch (error) {
-    return res.status(500).send({ error });
+    return res.status(500).send({ error: error.message });
   }
-}
+};
 
 const resetPassword = async (req, res) => {
   try {
@@ -242,11 +278,14 @@ const resetPassword = async (req, res) => {
 
     // user only have 5 attempts to verify
     if (user.resetPassword?.verifyAttempts >= 5) {
-      return res.status(401).json({ message: 'You have reached the maximum number of attempts.' });
+      return res.status(401).json({
+        message: 'You have reached the maximum number of attempts.',
+      });
     }
 
     if (user.resetPassword?.verifyCode !== code.toString()) {
-      user.resetPassword.verifyAttempts = (user.resetPassword.verifyAttempts ?? 0) + 1;
+      user.resetPassword.verifyAttempts =
+        (user.resetPassword.verifyAttempts ?? 0) + 1;
       await user.save();
 
       return res.status(401).json({ message: 'Invalid verification code!' });
@@ -257,10 +296,12 @@ const resetPassword = async (req, res) => {
     user.resetPassword = undefined;
     await user.save();
 
-    return res.status(200).json({ message: 'Your password has been reset successfully' });
+    return res
+      .status(200)
+      .json({ message: 'Your password has been reset successfully' });
   } catch (error) {
     return res.status(500).send({ error });
   }
-}
+};
 
 module.exports = { signup, signin, requestCode, verifyCode, resetPassword };

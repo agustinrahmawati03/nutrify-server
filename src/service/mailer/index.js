@@ -22,13 +22,20 @@ const sendMailPromise = util.promisify(transporter.sendMail).bind(transporter);
 // General function to send an email
 const sendEmail = async (templateName, toEmail, subject, replacer) => {
     try {
-        const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
+        const templatePath = path.join(
+            __dirname,
+            'templates',
+            `${templateName}.html`
+        );
         let htmlTemplate = fs.readFileSync(templatePath, 'utf8');
 
         // Replace placeholders with actual values
         for (const key in replacer) {
             const placeholder = `{{${key}}}`;
-            htmlTemplate = htmlTemplate.replace(new RegExp(placeholder, 'g'), replacer[key]);
+            htmlTemplate = htmlTemplate.replace(
+                new RegExp(placeholder, 'g'),
+                replacer[key]
+            );
         }
 
         const mailOptions = {
@@ -48,8 +55,12 @@ const sendEmail = async (templateName, toEmail, subject, replacer) => {
 };
 
 // Example of specific email function
-const sendVerificationCodeEmail = async (toEmail, code) => {
-    return sendEmail('verification', toEmail, 'Nutrify Password Reset Verification', {
+const sendVerificationCodeEmail = async (
+    toEmail,
+    code,
+    subject = 'Nutrify Password Reset Verification'
+) => {
+    return sendEmail('verification', toEmail, subject, {
         email: toEmail,
         code: code,
     });
