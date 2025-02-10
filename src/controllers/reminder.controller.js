@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Tracking = require('../models/tracking');
 const Reminder = require('../models/reminder');
+const { sendEmail } = require('../service/mailer');
 
 const collectUsers = async (req, res) => {
   try {
@@ -46,6 +47,14 @@ const sendReminders = async (limit = 2) => {
 
     for (const reminder of remindersToSend) {
       const { email, replacer } = reminder;
+      
+      try {
+        replacer.link = "http://localhost:5173/"
+        const info = await sendEmail ("reminder", email , "ayo tracking", replacer);
+        
+      } catch (error) {
+        console.error (error.message);
+      }
 
       await Reminder.updateOne(
         { _id: reminder._id },

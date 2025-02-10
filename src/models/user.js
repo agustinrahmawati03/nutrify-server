@@ -27,6 +27,11 @@ const userSchema = new Schema(
       maxlength: 255,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['admin', 'user'],
+      default: 'user',
+    },
     tinggi: {
       type: Number,
       maxlength: 3,

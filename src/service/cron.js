@@ -12,7 +12,7 @@ cron.schedule('0 0 * * 0', async () => {
 });
 
 // Run the sender every minute on Sunday
-cron.schedule('* * * * 0', async () => {
+cron.schedule('* 8-21 * * 0', async () => {
   try {
     console.log('Running reminder sender...');
     await sendReminders();
