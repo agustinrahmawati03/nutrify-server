@@ -2,8 +2,12 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const { tokenGenerated } = require('../middleware/token');
-const { getLevelActivity, hitungBMI, getBBIstatus } = require('../service');
-const { sendVerificationCodeEmail } = require('../service/mailer');
+const {
+  getLevelActivity,
+  hitungBMI,
+  getBBIstatus,
+} = require('../service');
+const { sendVerificationCodeEmail } = require('../service/mailer/index');
 
 const signup = async (req, res) => {
   try {
@@ -131,7 +135,7 @@ const signin = async (req, res) => {
 
     const token = {
       _id: user._id,
-      role: 'user',
+      role: user.role || 'user',
     };
 
     const tokenCreated = tokenGenerated(token);
