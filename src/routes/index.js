@@ -18,4 +18,8 @@ router.use('/profile', userRoute);
 router.use('/favorite', favoriteRoute);
 router.use('/exercises', exerciseRoute);
 
+// cron
+const cronRoute = require('./cron.router');
+router.use('/cron', cronRoute);
+
 module.exports = router;

@@ -8,6 +8,11 @@ const exerciseSchema = new Schema(
       maxlength: 255,
       required: true,
     },
+    icon: {
+      type: String,
+      maxlength: 255,
+      required: false,
+    },
     min_bbi: {
       type: Number,
       required: true,
@@ -26,6 +31,16 @@ const exerciseSchema = new Schema(
       maxlength: 1000,
       required: true,
     },
+    benefit: {
+      type: String,
+      maxlength: 255,
+      required: true,
+    },
+    tips: {
+      type: String,
+      maxlength: 255,
+      required: true,
+    }
   },
   {
     timestamps: true, // Menambahkan createdAt dan updatedAt otomatis
