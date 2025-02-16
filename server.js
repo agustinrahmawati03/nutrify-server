@@ -1,9 +1,9 @@
 const express = require('express');
-const allrouter = require('./routes');
-const database = require('./config/database');
+const allrouter = require('./src/routes');
+const database = require('./src/config/database');
 const app = express();
 var cors = require('cors');
-const { sendEmail } = require('./service/mailer');
+const { sendEmail } = require('./src/service/mailer');
 app.use(cors());
 
 const port = process.env.PORT || 9000;
@@ -31,7 +31,7 @@ app.listen(port, () => {
 //   console.log (info);
 // }, 7 * 24 * 60 * 60 * 1000);
 
-require ("./service/cron")
+require ("./src/service/cron")
 
 module.exports = app;
 

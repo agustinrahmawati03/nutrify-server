@@ -1,5 +1,16 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
+
+const VerificationSchema = new Schema(
+  {
+    status: { type: Boolean, default: false },
+    lastSent: { type: Date },
+    resetAttempts: { type: Number, default: 0 },
+    verifyAttempts: { type: Number, default: 0 },
+    verifyCode: { type: String },
+  },
+  { _id: false }
+);
 
 const userSchema = new Schema(
   {
@@ -15,7 +26,7 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ['pria', 'wanita'],
+      enum: ["pria", "wanita"],
     },
     status: {
       type: String,
@@ -26,6 +37,11 @@ const userSchema = new Schema(
       type: String,
       maxlength: 255,
       required: true,
+    },
+    role: {
+      type: String,
+      enum: ['admin', 'user'],
+      default: 'user',
     },
     tinggi: {
       type: Number,
@@ -58,12 +74,13 @@ const userSchema = new Schema(
     bbi: {
       type: Object,
     },
-    resetPassword:{
+    verification: { type: VerificationSchema, default: () => ({}) },
+    resetPassword: {
       lastSent: Date,
       resetAttempts: Number,
       verifyAttempts: Number,
       verifyCode: String,
-    }
+    },
   },
   {
     timestamps: true,
@@ -71,6 +88,6 @@ const userSchema = new Schema(
   }
 );
 
-const userModel = mongoose.model('User', userSchema);
+const userModel = mongoose.model("User", userSchema);
 
 module.exports = userModel;

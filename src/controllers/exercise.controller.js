@@ -4,20 +4,23 @@ const User = require("../models/user");
 const addExercise = async (req, res) => {
   try {
     // Ambil data dari request body
-    const { name, min_bbi, max_bbi, duration, description } = req.body;
+    const { name, icon, min_bbi, max_bbi, duration, description, benefit, tips } = req.body;
 
     // Validasi data
-    if (!name || !min_bbi || !max_bbi || !duration || !description) {
+    if (!name || !icon || !min_bbi || !max_bbi || !duration || !description || !benefit || !tips) {
       return res.status(400).send({ message: "All fields are required" });
     }
 
     // Buat dokumen exercise baru
     const newExercise = new Exercise({
       name,
+      icon,
       min_bbi,
       max_bbi,
       duration,
       description,
+      benefit,
+      tips,
     });
 
     // Simpan ke database
@@ -92,15 +95,15 @@ const getExerciseRecommendations = async (req, res) => {
 const updateExercise = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, min_bbi, max_bbi, duration, description } = req.body;
+    const { name, icon, min_bbi, max_bbi, duration, description, benefit, tips} = req.body;
 
-    if (!name || !min_bbi || !max_bbi || !duration || !description) {
+    if (!name || !icon || !min_bbi || !max_bbi || !duration || !description || !benefit || !tips) {
       return res.status(400).send({ message: "All fields are required" });
     }
 
     const updatedExercise = await Exercise.findByIdAndUpdate(
       id,
-      { name, min_bbi, max_bbi, duration, description },
+      { name, icon, min_bbi, max_bbi, duration, description, benefit, tips },
       { new: true } // Return the updated document
     );
 
