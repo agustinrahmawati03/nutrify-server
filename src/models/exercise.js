@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const exerciseSchema = new Schema(
@@ -13,11 +13,11 @@ const exerciseSchema = new Schema(
       maxlength: 255,
       required: false,
     },
-    min_bbi: {
+    min_bmi: {
       type: Number,
       required: true,
     },
-    max_bbi: {
+    max_bmi: {
       type: Number,
       required: true,
     },
@@ -40,7 +40,7 @@ const exerciseSchema = new Schema(
       type: String,
       maxlength: 255,
       required: true,
-    }
+    },
   },
   {
     timestamps: true, // Menambahkan createdAt dan updatedAt otomatis
@@ -48,6 +48,6 @@ const exerciseSchema = new Schema(
   }
 );
 
-const exerciseModel = mongoose.model("Exercise", exerciseSchema);
+const exerciseModel = mongoose.model('Exercise', exerciseSchema);
 
 module.exports = exerciseModel;

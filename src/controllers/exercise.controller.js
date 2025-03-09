@@ -1,22 +1,40 @@
 const { tokenReturned } = require('../middleware/token');
-const Exercise = require("../models/exercise");
-const User = require("../models/user");
+const Exercise = require('../models/exercise');
+const User = require('../models/user');
 const addExercise = async (req, res) => {
   try {
     // Ambil data dari request body
-    const { name, icon, min_bbi, max_bbi, duration, description, benefit, tips } = req.body;
+    const {
+      name,
+      icon,
+      min_bmi,
+      max_bmi,
+      duration,
+      description,
+      benefit,
+      tips,
+    } = req.body;
 
     // Validasi data
-    if (!name || !icon || !min_bbi || !max_bbi || !duration || !description || !benefit || !tips) {
-      return res.status(400).send({ message: "All fields are required" });
+    if (
+      !name ||
+      !icon ||
+      !min_bmi ||
+      !max_bmi ||
+      !duration ||
+      !description ||
+      !benefit ||
+      !tips
+    ) {
+      return res.status(400).send({ message: 'All fields are required' });
     }
 
     // Buat dokumen exercise baru
     const newExercise = new Exercise({
       name,
       icon,
-      min_bbi,
-      max_bbi,
+      min_bmi,
+      max_bmi,
       duration,
       description,
       benefit,
@@ -28,7 +46,7 @@ const addExercise = async (req, res) => {
 
     // Kirim respon sukses
     res.status(201).send({
-      message: "Exercise added successfully",
+      message: 'Exercise added successfully',
       exercise: newExercise,
     });
   } catch (error) {
@@ -41,7 +59,7 @@ const getAllExercises = async (req, res) => {
   try {
     const exercises = await Exercise.find();
     res.status(200).send({
-      message: "Exercises retrieved successfully",
+      message: 'Exercises retrieved successfully',
       data: { exercises },
     });
   } catch (error) {
@@ -55,11 +73,11 @@ const getExerciseById = async (req, res) => {
     const exercise = await Exercise.findById(id);
 
     if (!exercise) {
-      return res.status(404).send({ message: "Exercise not found" });
+      return res.status(404).send({ message: 'Exercise not found' });
     }
 
     res.status(200).send({
-      message: "Exercise retrieved successfully",
+      message: 'Exercise retrieved successfully',
       data: {
         exercise,
       },
@@ -74,15 +92,15 @@ const getExerciseRecommendations = async (req, res) => {
     const { data } = tokenReturned(req, res);
     const userId = data._id;
     const user = await User.findById(userId);
-    const bbi = user.bbi.value;
-    // Find exercises that match the BBI range
+    const bmi = user.bmi;
+    // Find exercises that match the bmi range
     const recommendedExercises = await Exercise.find({
-      min_bbi: { $lte: parseFloat(bbi) },
-      max_bbi: { $gte: parseFloat(bbi) },
+      min_bmi: { $lte: parseFloat(bmi) },
+      max_bmi: { $gte: parseFloat(bmi) },
     });
 
     res.status(200).send({
-      message: "Recommended exercises retrieved successfully",
+      message: 'Recommended exercises retrieved successfully',
       data: {
         recommendations: recommendedExercises,
       },
@@ -95,27 +113,46 @@ const getExerciseRecommendations = async (req, res) => {
 const updateExercise = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, icon, min_bbi, max_bbi, duration, description, benefit, tips} = req.body;
+    const {
+      name,
+      icon,
+      min_bmi,
+      max_bmi,
+      duration,
+      description,
+      benefit,
+      tips,
+    } = req.body;
 
-    if (!name || !icon || !min_bbi || !max_bbi || !duration || !description || !benefit || !tips) {
-      return res.status(400).send({ message: "All fields are required" });
+    if (
+      !name ||
+      !icon ||
+      min_bmi == null ||
+      min_bmi == '' ||
+      !max_bmi ||
+      !duration ||
+      !description ||
+      !benefit ||
+      !tips
+    ) {
+      return res.status(400).send({ message: 'All fields are required' });
     }
 
     const updatedExercise = await Exercise.findByIdAndUpdate(
       id,
-      { name, icon, min_bbi, max_bbi, duration, description, benefit, tips },
+      { name, icon, min_bmi, max_bmi, duration, description, benefit, tips },
       { new: true } // Return the updated document
     );
 
     if (!updatedExercise) {
-      return res.status(404).send({ message: "Exercise not found" });
+      return res.status(404).send({ message: 'Exercise not found' });
     }
 
     res.status(200).send({
-      message: "Exercise updated successfully",
+      message: 'Exercise updated successfully',
       data: {
         exercise: updatedExercise,
-      }
+      },
     });
   } catch (error) {
     res.status(500).send({ message: error.message });
@@ -128,11 +165,11 @@ const deleteExercise = async (req, res) => {
     const deletedExercise = await Exercise.findByIdAndDelete(id);
 
     if (!deletedExercise) {
-      return res.status(404).send({ message: "Exercise not found" });
+      return res.status(404).send({ message: 'Exercise not found' });
     }
 
     res.status(200).send({
-      message: "Exercise deleted successfully",
+      message: 'Exercise deleted successfully',
       data: {
         deletedExercise,
       },

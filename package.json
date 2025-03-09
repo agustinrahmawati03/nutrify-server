@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development nodemon ./src/server.js",
     "prod": "node ./src/server.js",
-    "start": "node ./src/server.js"
+    "start": "node ./src/server.js",
+    "dev:seed": "cross-env NODE_ENV=development node ./dev/seeders/admin.js"
   },
   "keywords": [],
   "author": "C523-PS006",
