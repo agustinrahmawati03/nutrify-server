@@ -6,6 +6,7 @@ const {
   getLevelActivity,
   hitungBMI,
   getBBIstatus,
+  getStatusBMI,
 } = require('../service');
 const { sendVerificationCodeEmail } = require('../service/mailer/index');
 
@@ -55,7 +56,8 @@ const signup = async (req, res) => {
 
     // Compute nutrition needs
     const levActivicty = getLevelActivity(levelActivity);
-    const statusBMI = hitungBMI(berat, tinggi);
+    const bmi = hitungBMI(berat, tinggi);
+    const statusBMI = getStatusBMI(bmi);
     const bbi = getBBIstatus(gender, tinggi, berat);
 
     let bmr =
@@ -67,6 +69,7 @@ const signup = async (req, res) => {
     user.carboNeeded = (user.caloriNeeded * 0.65) / 4;
     user.proteinNeeded = (user.caloriNeeded * 0.15) / 4;
     user.fatNeeded = (user.caloriNeeded * 0.2) / 9;
+    user.bmi = bmi;
     user.status = statusBMI;
     user.bbi = bbi;
 
@@ -101,6 +104,7 @@ const signup = async (req, res) => {
       carboNeeded: user.carboNeeded,
       proteinNeeded: user.proteinNeeded,
       fatNeeded: user.fatNeeded,
+      bmi: user.bmi,
       status: user.status,
       bbi: user.bbi,
     };

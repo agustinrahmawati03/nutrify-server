@@ -2,7 +2,7 @@ const getLevelActivity = (levActivicty) => {
   if (levActivicty === 1) {
     return 1.2;
   }
-  if (levActivicty === 1) {
+  if (levActivicty === 2) {
     return 1.4;
   }
   if (levActivicty === 3) {
@@ -24,7 +24,10 @@ function hitungBMI(berat, tinggi) {
 
   // Hitung BMI
   let bmi = berat / (tinggiMeter * tinggiMeter);
+  return bmi;
+}
 
+function getStatusBMI(bmi) {
   if (bmi < 18.5) {
     return 'Kurang';
   }
@@ -38,6 +41,7 @@ function hitungBMI(berat, tinggi) {
     return 'Obesitas';
   }
 }
+
 const findByDate = (data, trackDate) => {
   const tracking = data.findIndex((el) =>
     el.date.toISOString().includes(trackDate)
@@ -78,17 +82,9 @@ const totalNutri = (data) => {
 };
 
 const validateUserProfileData = (data) => {
-  const { username, gender, tinggi, berat, levelAktivitas, umur } =
-    data;
+  const { username, gender, tinggi, berat, levelAktivitas, umur } = data;
 
-  if (
-    !username ||
-    !gender ||
-    !tinggi ||
-    !berat ||
-    !levelAktivitas ||
-    !umur
-  ) {
+  if (!username || !gender || !tinggi || !berat || !levelAktivitas || !umur) {
     return false;
   }
   return true;
@@ -120,6 +116,7 @@ const getBBIstatus = (gender, tinggi, berat) => {
 module.exports = {
   getLevelActivity,
   hitungBMI,
+  getStatusBMI,
   findByDate,
   totalNutri,
   validateUserProfileData,

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const VerificationSchema = new Schema(
@@ -26,7 +26,7 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      enum: ["pria", "wanita"],
+      enum: ['pria', 'wanita'],
     },
     status: {
       type: String,
@@ -71,6 +71,10 @@ const userSchema = new Schema(
       type: Number,
       required: true,
     },
+    bmi: {
+      type: Number,
+      maxlength: 3,
+    },
     bbi: {
       type: Object,
     },
@@ -88,6 +92,6 @@ const userSchema = new Schema(
   }
 );
 
-const userModel = mongoose.model("User", userSchema);
+const userModel = mongoose.model('User', userSchema);
 
 module.exports = userModel;
