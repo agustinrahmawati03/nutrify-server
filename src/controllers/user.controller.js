@@ -6,6 +6,7 @@ const {
   hitungBMI,
   validateUserProfileData,
   getBBIstatus,
+  getStatusBMI,
 } = require('../service');
 
 const getUserProfile = async (req, res) => {
@@ -16,8 +17,7 @@ const getUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const { password, ...userWithoutPassword } =
-      currentUser.toObject();
+    const { password, ...userWithoutPassword } = currentUser.toObject();
     return res
       .status(200)
       .json({ message: 'Success', profile: userWithoutPassword });
@@ -31,13 +31,10 @@ const editUserProfile = async (req, res) => {
     const { data } = tokenReturned(req, res);
 
     // Get new data from the request
-    const { username, gender, tinggi, berat, levelAktivitas, umur } =
-      req.body;
+    const { username, gender, tinggi, berat, levelAktivitas, umur } = req.body;
 
     if (!validateUserProfileData(req.body)) {
-      return res
-        .status(400)
-        .json({ message: 'Invalid user profile data' });
+      return res.status(400).json({ message: 'Invalid user profile data' });
     }
 
     const currentUser = await User.findById(data._id);
@@ -45,15 +42,17 @@ const editUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const bmi = hitungBMI(berat, tinggi);
     currentUser.username = username;
     currentUser.gender = gender;
     currentUser.tinggi = tinggi;
     currentUser.berat = berat;
     currentUser.umur = umur;
+    currentUser.bmi = bmi;
     currentUser.levelActivity = levelAktivitas;
 
     // Recalculate BMI and nutrition needs based on new data
-    const statusBMI = hitungBMI(berat, tinggi);
+    const statusBMI = getStatusBMI(bmi);
     const bmr =
       gender === 'pria'
         ? 665 + 13.7 * berat + 5 * tinggi - 6.8 * umur
@@ -90,8 +89,7 @@ const editUserProfile = async (req, res) => {
 
 const changeUserPassword = async (req, res) => {
   try {
-    const { currentPassword, newPassword, confirmPassword } =
-      req.body;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
     const { data } = tokenReturned(req, res);
     const currentUser = await User.findById(data._id);
 
@@ -99,19 +97,12 @@ const changeUserPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const isMatch = await bcrypt.compare(
-      currentPassword,
-      currentUser.password
-    );
+    const isMatch = await bcrypt.compare(currentPassword, currentUser.password);
     if (!isMatch) {
-      return res
-        .status(400)
-        .json({ message: 'Incorrect current password' });
+      return res.status(400).json({ message: 'Incorrect current password' });
     }
     if (newPassword !== confirmPassword) {
-      return res
-        .status(400)
-        .json({ message: 'New passwords do not match' });
+      return res.status(400).json({ message: 'New passwords do not match' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -119,8 +110,7 @@ const changeUserPassword = async (req, res) => {
     currentUser.password = hashedPassword;
     await currentUser.save();
 
-    const { password, ...userWithoutPassword } =
-      currentUser.toObject();
+    const { password, ...userWithoutPassword } = currentUser.toObject();
     res.json({
       message: 'Password updated successfully',
       changeSuccess: userWithoutPassword,
