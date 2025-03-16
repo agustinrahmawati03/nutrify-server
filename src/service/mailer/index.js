@@ -57,11 +57,13 @@ const sendEmail = async (templateName, toEmail, subject, replacer) => {
 // Example of specific email function
 const sendVerificationCodeEmail = async (
     toEmail,
+    username,
     code,
     subject = 'Nutrify Password Reset Verification'
 ) => {
     return sendEmail('verification', toEmail, subject, {
         email: toEmail,
+        username,
         code: code,
     });
 };
