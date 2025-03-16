@@ -11,7 +11,7 @@ const getAllFoods = async (req, res) => {
       const food = await Food.find();
       return res.status(200).send({ message: 'success', food });
     } else {
-      const userId = userData._id;
+      const userId = userData.data._id;
       const user = await User.findById(userId);
       if (!user) throw new Error('User not found');
 
