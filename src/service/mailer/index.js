@@ -59,7 +59,7 @@ const sendVerificationCodeEmail = async (
     toEmail,
     username,
     code,
-    subject = 'Nutrify Password Reset Verification'
+    subject = 'Konfirmasi Reset Password Nutrisiku'
 ) => {
     return sendEmail('verification', toEmail, subject, {
         email: toEmail,
