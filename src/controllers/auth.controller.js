@@ -86,7 +86,7 @@ const signup = async (req, res) => {
       verifyCode: OTP,
     };
 
-    await sendVerificationCodeEmail(email, OTP, 'Verify Your Registration');
+    await sendVerificationCodeEmail(email, username, OTP, 'Verify Your Registration');
 
     // Save or update user in database
     await user.save();
@@ -215,6 +215,7 @@ const requestCode = async (req, res) => {
 
     const status = await sendVerificationCodeEmail(
       email,
+      user.username,
       OTP,
       type == 'register'
         ? 'Verify Your Registration'
