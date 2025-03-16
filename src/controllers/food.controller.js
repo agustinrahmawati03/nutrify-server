@@ -1,3 +1,4 @@
+const { tokenReturned } = require('../middleware/token');
 const Food = require('../models/food');
 const User = require('../models/user');
 
@@ -24,7 +25,7 @@ const getAllFoods = async (req, res) => {
         foodQuery.sort((a, b) => b.protein - a.protein || b.fat - a.fat);
       } else if (bmi > 25) {
         // Overweight: Sort by lowest fat first
-        foodQuery.sort((a, b) => a.fat - b.fat);
+        foodQuery.sort((a, b) => a.fat - b.fat || a.cal - b.cal);
       } else {
         // Normal BMI: Find foods closest to caloriNeeded
         foodQuery.sort(
