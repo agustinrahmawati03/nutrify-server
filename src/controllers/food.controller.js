@@ -1,10 +1,43 @@
 const Food = require('../models/food');
+const User = require('../models/user');
 
 const getAllFoods = async (req, res) => {
   try {
-    const food = await Food.find();
+    const userData = tokenReturned(req, res);
 
-    return res.status(200).send({ message: 'success', food });
+    if (!userData) {
+      // User is not logged in, return all foods normally
+      const food = await Food.find();
+      return res.status(200).send({ message: 'success', food });
+    } else {
+      const userId = userData._id;
+      const user = await User.findById(userId);
+      if (!user) throw new Error('User not found');
+
+      const bmi = user.bmi;
+      const caloriNeeded = user.caloriNeeded;
+
+      let foodQuery = await Food.find();
+
+      if (bmi < 18) {
+        // Underweight: Sort by highest protein first, then by fat
+        foodQuery.sort((a, b) => b.protein - a.protein || b.fat - a.fat);
+      } else if (bmi > 25) {
+        // Overweight: Sort by lowest fat first
+        foodQuery.sort((a, b) => a.fat - b.fat);
+      } else {
+        // Normal BMI: Find foods closest to caloriNeeded
+        foodQuery.sort(
+          (a, b) =>
+            Math.abs(a.cal - caloriNeeded) - Math.abs(b.cal - caloriNeeded)
+        );
+      }
+
+      return res.status(200).send({
+        message: 'Recommended foods retrieved successfully',
+        food: foodQuery,
+      });
+    }
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
@@ -13,13 +46,13 @@ const getAllFoods = async (req, res) => {
 const addManyFoods = async (req, res) => {
   try {
     // Ubah string ID kategori menjadi ObjectId
-    const foodsWithObjectId = req.body.map(food => ({
+    const foodsWithObjectId = req.body.map((food) => ({
       ...food,
-      categories: food.categories.map(category => category),
+      categories: food.categories.map((category) => category),
     }));
 
     await Food.insertMany(foodsWithObjectId);
-    
+
     res.status(201).send({
       message: 'Food added successfully',
     });
