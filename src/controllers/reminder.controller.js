@@ -50,7 +50,7 @@ const sendReminders = async (limit = 2) => {
       
       try {
         replacer.link = "https://nutrisiku.my.id/"
-        const info = await sendEmail ("reminder", email , "ayo tracking", replacer);
+        const info = await sendEmail ("reminder", email , "Jangan Lupa Tracking", replacer);
         
       } catch (error) {
         console.error (error.message);
