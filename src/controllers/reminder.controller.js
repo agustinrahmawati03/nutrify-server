@@ -49,7 +49,7 @@ const sendReminders = async (limit = 2) => {
       const { email, replacer } = reminder;
       
       try {
-        replacer.link = "http://localhost:5173/"
+        replacer.link = "https://nutrisiku.my.id/"
         const info = await sendEmail ("reminder", email , "ayo tracking", replacer);
         
       } catch (error) {
