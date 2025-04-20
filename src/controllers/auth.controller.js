@@ -86,7 +86,12 @@ const signup = async (req, res) => {
       verifyCode: OTP,
     };
 
-    await sendVerificationCodeEmail(email, username, OTP, 'Verify Your Registration');
+    await sendVerificationCodeEmail(
+      email,
+      username,
+      OTP,
+      'Verify Your Registration'
+    );
 
     // Save or update user in database
     await user.save();
@@ -162,6 +167,7 @@ const signin = async (req, res) => {
         proteinNeeded: user.proteinNeeded,
         fatNeeded: user.fatNeeded,
         bbi: user.bbi,
+        bmi: user.bmi,
       },
     };
 
