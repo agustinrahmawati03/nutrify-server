@@ -194,14 +194,24 @@ const requestCode = async (req, res) => {
       type === 'register' ? 'verification' : 'resetPassword';
     const lastSent = user[targetProperty]?.lastSent ?? 0;
     const now = Date.now();
-    const diffMinutes = Math.floor((now - lastSent) / 1000 / 60);
+    // const diffMinutes = Math.floor((now - lastSent) / 1000 / 60);
+    const diffSeconds = Math.floor((now - lastSent) / 1000);
     const attempts = user[targetProperty]?.resetAttempts ?? 0;
+    const cooldownSeconds = 2 * 60;
 
     // Enforce cooldown period
-    if (attempts > 0 && diffMinutes < attempts * 3) {
-      const remainingMinutes = attempts * 3 - diffMinutes;
+    if (attempts > 0 && diffSeconds < cooldownSeconds) {
+      const remainingSeconds = cooldownSeconds - diffSeconds;
+      const remainingMinutes = Math.floor(remainingSeconds / 60);
+      const remainingSecondsOnly = remainingSeconds % 60;
+
+      let message = 'You can send the verification code in ';
+      if (remainingMinutes > 0) {
+        message += `${remainingMinutes} minutes and `;
+      }
+      message += `${remainingSecondsOnly} seconds.`;
       return res.status(200).json({
-        message: `You can send the verification code in ${remainingMinutes} minutes.`,
+        message,
       });
     }
 
