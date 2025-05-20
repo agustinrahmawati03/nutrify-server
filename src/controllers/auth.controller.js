@@ -260,9 +260,9 @@ const verifyCode = async (req, res) => {
     const targetProperty =
       type === 'register' ? 'verification' : 'resetPassword';
 
-    // User only has 5 attempts
-    if (user[targetProperty]?.verifyAttempts >= 5) {
-      return res.status(401).json({
+    // User only has 3 attempts
+    if (user[targetProperty]?.verifyAttempts >= 3) {
+      return res.status(429).json({
         message: 'You have reached the maximum number of attempts.',
       });
     }
@@ -272,7 +272,7 @@ const verifyCode = async (req, res) => {
       user[targetProperty].verifyAttempts =
         (user[targetProperty]?.verifyAttempts ?? 0) + 1;
       await user.save();
-      return res.status(401).json({ message: 'Invalid verification code!' });
+      return res.status(400).json({ message: 'Invalid verification code!' });
     }
 
     // If type is register, update verification status
