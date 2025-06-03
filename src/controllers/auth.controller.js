@@ -235,7 +235,7 @@ const requestCode = async (req, res) => {
       OTP,
       type == 'register'
         ? 'Verify Your Registration'
-        : 'Nutrify Password Reset Verification'
+        : 'Nutrisiku Password Reset Verification'
     );
     return res.status(201).json({
       message: 'Verification code has been sent to your email.',
