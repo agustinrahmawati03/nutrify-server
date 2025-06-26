@@ -191,7 +191,7 @@ const sendVerificationCodeEmail = async (toEmail, code) => {
     const mailOptions = {
         from: `"${process.env.SMTP_SENDER_ALIAS}" <${process.env.SMTP_USER}>`,
         to: toEmail,
-        subject: 'Nutrify Password Reset Verification',
+        subject: 'Verifikasi Atur Ulang Kata Sandi Nutrisiku',
         html: htmlTemplate.replace('{{code}}', code).replace('{{email}}', toEmail),
     };
 
