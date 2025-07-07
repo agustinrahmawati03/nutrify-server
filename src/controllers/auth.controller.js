@@ -259,18 +259,29 @@ const verifyCode = async (req, res) => {
     // Determine which property to use
     const targetProperty =
       type === 'register' ? 'verification' : 'resetPassword';
+    const verifyData = user[targetProperty];
 
     // User only has 3 attempts
-    if (user[targetProperty]?.verifyAttempts >= 3) {
+    if (verifyData?.verifyAttempts >= 3) {
       return res.status(429).json({
         message: 'You have reached the maximum number of attempts.',
       });
     }
 
+    // verifikasi kadaluwarsa
+    const otpExpirationMinutes = 15;
+    const now = Date.now();
+    const timeDiffMs = now - targetData.lastSent;
+    const timeDiffMinutes = timeDiffMs / (1000 * 60);
+    if (timeDiffMinutes > otpExpirationMinutes) {
+      return res.status(410).json({
+        message: 'Verification code has expired. Please request a new one.',
+      });
+    }
+
     // Check if code matches
-    if (user[targetProperty]?.verifyCode !== code.toString()) {
-      user[targetProperty].verifyAttempts =
-        (user[targetProperty]?.verifyAttempts ?? 0) + 1;
+    if (verifyData?.verifyCode !== code.toString()) {
+      verifyData.verifyAttempts = (verifyData?.verifyAttempts ?? 0) + 1;
       await user.save();
       return res.status(400).json({ message: 'Invalid verification code!' });
     }
