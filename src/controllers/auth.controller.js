@@ -268,22 +268,22 @@ const verifyCode = async (req, res) => {
       });
     }
 
-    // verifikasi kadaluwarsa
-    const otpExpirationMinutes = 15;
-    const now = Date.now();
-    const timeDiffMs = now - targetData.lastSent;
-    const timeDiffMinutes = timeDiffMs / (1000 * 60);
-    if (timeDiffMinutes > otpExpirationMinutes) {
-      return res.status(410).json({
-        message: 'Verification code has expired. Please request a new one.',
-      });
-    }
-
     // Check if code matches
     if (verifyData?.verifyCode !== code.toString()) {
       verifyData.verifyAttempts = (verifyData?.verifyAttempts ?? 0) + 1;
       await user.save();
       return res.status(400).json({ message: 'Invalid verification code!' });
+    }
+
+    // verifikasi kadaluwarsa
+    const otpExpirationMinutes = 15;
+    const now = Date.now();
+    const timeDiffMs = now - verifyData.lastSent;
+    const timeDiffMinutes = timeDiffMs / (1000 * 60);
+    if (timeDiffMinutes > otpExpirationMinutes) {
+      return res.status(410).json({
+        message: 'Verification code has expired. Please request a new one.',
+      });
     }
 
     // If type is register, update verification status
