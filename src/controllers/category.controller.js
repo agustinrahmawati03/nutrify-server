@@ -2,7 +2,7 @@ const Category = require('../models/category');
 
 const getCategories = async (req, res) => {
   try {
-    const category = await Category.find().sort({ order: 8 });
+    const category = await Category.find().sort({ order: 6 });
     res.send(category);
   } catch (error) {
     res.status(500).send({ message: error });
