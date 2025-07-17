@@ -39,9 +39,7 @@ const addTracking = async (req, res) => {
       trackExist.tracking.push(tracking);
 
       await trackExist.save();
-      return res
-        .status(200)
-        .json({ message: 'add success', body: trackExist });
+      return res.status(200).json({ message: 'add success', body: trackExist });
     }
     // cek apakah merupakan track baru
 
@@ -87,7 +85,7 @@ const getTrackingToday = async (req, res) => {
       return res.status(200).json({
         message: 'No tracking found!',
         body: {
-          tracking: {food:[]},
+          tracking: { food: [] },
           result: {},
         },
       });
@@ -125,9 +123,7 @@ const getTrackingByDate = async (req, res) => {
   try {
     // throw err when date not found
     if (!date) {
-      return res
-        .status(400)
-        .send({ message: 'please choose the date !' });
+      return res.status(400).send({ message: 'please choose the date !' });
     }
     // get data tracking by user
     const tracking = await Tracking.findOne({
@@ -145,7 +141,7 @@ const getTrackingByDate = async (req, res) => {
       return res.status(200).json({
         message: 'No tracking found!',
         body: {
-          tracking: {food:[]},
+          tracking: { food: [] },
           result: {},
         },
       });
@@ -158,7 +154,7 @@ const getTrackingByDate = async (req, res) => {
       return res.status(200).json({
         message: 'No tracking found!',
         body: {
-          tracking: {food:[]},
+          tracking: { food: [] },
           result: {},
         },
       });
@@ -185,4 +181,59 @@ const getTrackingByDate = async (req, res) => {
   }
 };
 
-module.exports = { addTracking, getTrackingToday, getTrackingByDate };
+const deleteTrackedFood = async (req, res) => {
+  try {
+    const { data } = tokenReturned(req, res);
+    const userId = data._id;
+    const { date, foodId, time } = req.body;
+
+    if (!date || !foodId || !time) {
+      return res.status(400).json({
+        message: 'date, foodId, and time are required',
+      });
+    }
+
+    const trackingDoc = await Tracking.findOne({ user: userId });
+
+    if (!trackingDoc) {
+      return res.status(404).json({ message: 'Tracking not found' });
+    }
+
+    const trackingIndex = findByDate(trackingDoc.tracking, date);
+
+    if (trackingIndex < 0) {
+      return res.status(404).json({ message: 'Tracking date not found' });
+    }
+
+    const foodArray = trackingDoc.tracking[trackingIndex].food;
+
+    const initialLength = foodArray.length;
+
+    // Filter out the food item with matching foodId and time
+    trackingDoc.tracking[trackingIndex].food = foodArray.filter(
+      (item) => !(item.foodId.toString() === foodId && item.time === time)
+    );
+
+    if (trackingDoc.tracking[trackingIndex].food.length === initialLength) {
+      return res
+        .status(404)
+        .json({ message: 'Food item not found in tracking' });
+    }
+
+    await trackingDoc.save();
+
+    return res.status(200).json({
+      message: 'Food item deleted successfully',
+      // body: trackingDoc,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  addTracking,
+  getTrackingToday,
+  getTrackingByDate,
+  deleteTrackedFood,
+};
